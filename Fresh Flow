@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#389C9A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FreshFlow">
+<title>FreshFlow</title>
+<link rel="manifest" href="#" id="manifest-link">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/idb-keyval@6/dist/umd.js"></script>
+
+<style>
+/* ══════════════════════════════════════════════════════════════
+   FRESHFLOW – COMPLETE OPTIMIZED VERSION (Avatar fix + all improvements)
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  --bg:#FFFFFF;--surface:#FFFFFF;--surface2:#F5F5F2;--border:#E0DED8;
+  --text:#1D1D1D;--text2:#555;--text3:#888;--text4:#bbb;
+  --green:#389C9A;--green-l:#D4F1F0;--green-d:#1D4E4B;
+  --amber:#FEDB71;--amber-l:#FFF9E6;
+  --red:#E24B4A;--red-l:#FCEBEB;
+  --blue:#378ADD;--blue-l:#E6F1FB;
+  --purple:#7F77DD;--purple-l:#EEEDFE;
+  --nav-h:66px;--top:0px;
+  --radius:18px;--radius-sm:12px;--radius-xs:9px;
+  --shadow:0 2px 16px rgba(0,0,0,.08);
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  --transition: opacity .2s cubic-bezier(.4,0,.2,1), transform .2s cubic-bezier(.4,0,.2,1), background-color .2s cubic-bezier(.4,0,.2,1), border-color .2s cubic-bezier(.4,0,.2,1), color .2s cubic-bezier(.4,0,.2,1), box-shadow .2s cubic-bezier(.4,0,.2,1);
+}
+[data-dark="true"] {
+  --bg:#111;--surface:#1E1E1E;--surface2:#2A2A2A;--border:#333;
+  --text:#F0F0F0;--text2:#ccc;--text3:#888;--text4:#555;
+  --green-l:#0d3d2d;--amber-l:#3d2e0a;--red-l:#3d1010;--blue-l:#0e2640;--purple-l:#201e40;
+  --shadow:0 2px 16px rgba(0,0,0,.4);
+}
+[data-theme="ocean"] { --green:#0077B6; --green-l:#E0F0FA; --green-d:#023E8A; --amber:#F4A261; --amber-l:#FDEBD0; }
+[data-theme="sunset"] { --green:#E76F51; --green-l:#FCE4D6; --green-d:#9C3A1A; --amber:#E9C46A; --amber-l:#FDF3D0; }
+[data-theme="forest"] { --green:#2D6A4F; --green-l:#D8F3DC; --green-d:#1B4332; --amber:#B7B7A4; --amber-l:#F0EFE7; }
+[data-theme="berry"] { --green:#9B5DE5; --green-l:#F3E8FF; --green-d:#5A189A; --amber:#F15BB5; --amber-l:#FDE4F0; }
+[data-theme="mono"] { --green:#4A4E69; --green-l:#E6E6E9; --green-d:#22223B; --amber:#9A8C98; --amber-l:#F2E9E4; }
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);font-size:15px;color:var(--text);background:var(--bg)}
+button,input,select,textarea{font-family:var(--font);font-size:15px}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+::-webkit-scrollbar{width:0}
+::placeholder{color:var(--text4)}
+
+#app{max-width:480px;margin:0 auto;height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--bg)}
+.view{display:none!important;flex-direction:column;flex:1;overflow:hidden;animation:fadeIn .2s ease}
+.view.active{display:flex!important}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--nav-h) + 16px)}
+.scroll.centered-empty{display:flex;align-items:center;justify-content:center}
+.scroll::-webkit-scrollbar{display:none}
+.px{padding-left:18px;padding-right:18px}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 8px;background:var(--bg);flex-shrink:0;gap:10px}
+.topbar h2{font-size:21px;font-weight:800;letter-spacing:-.3px;flex:1}
+.icon-btn{width:38px;height:38px;border-radius:11px;background:var(--surface);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);flex-shrink:0;transition:var(--transition);position:relative}
+.icon-btn:active{transform:scale(.93)}
+.icon-btn i{font-size:20px}
+.icon-btn .pulse-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--red);display:none;animation:pulse 1.5s infinite}
+@keyframes pulse{0%{transform:scale(1);opacity:1}50%{transform:scale(1.8);opacity:0}100%{transform:scale(1);opacity:0}}
+
+#bottom-nav{display:flex;background:rgba(255,255,255,.96);border-top:.5px solid var(--border);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:100;padding:8px 0 18px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+[data-dark="true"] #bottom-nav{background:rgba(30,30,30,.96)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;border:none;background:none;color:var(--text4);transition:var(--transition)}
+.nav-item i{font-size:23px;transition:var(--transition)}
+.nav-item span{font-size:10px;font-weight:600;letter-spacing:.2px;transition:var(--transition)}
+.nav-item.active{color:var(--green)}
+.nav-item:active{transform:scale(.9)}
+
+.card{background:var(--surface);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);transition:box-shadow .2s}
+.card:hover{box-shadow:0 4px 24px rgba(0,0,0,.12)}
+.card-sm{background:var(--surface);border-radius:var(--radius-sm);padding:13px 15px}
+.card+.card,.card-sm+.card-sm{margin-top:10px}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.inp{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-xs);padding:12px 14px;font-size:15px;color:var(--text);outline:none;transition:var(--transition);-webkit-appearance:none;appearance:none}
+.inp:focus{border-color:var(--green)}
+.inp.error{border-color:var(--red)}
+select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23888' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+
+.btn{width:100%;background:var(--green);color:#fff;border:none;border-radius:var(--radius-xs);padding:14px;font-size:15px;font-weight:700;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{filter:brightness(1.05)}
+.btn:active{opacity:.85;transform:scale(.98)}
+.btn-sec{background:var(--surface2);color:var(--text);border:1.5px solid var(--border)}
+.btn-danger{background:var(--red-l);color:var(--red);border:none}
+.btn-sm{padding:9px 16px;width:auto;font-size:13px;border-radius:9px}
+
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px}
+.badge-green{background:var(--green-l);color:var(--green-d)}
+.badge-amber{background:var(--amber-l);color:#BF360C}
+.badge-red{background:var(--red-l);color:#A32D2D}
+.badge-blue{background:var(--blue-l);color:#185FA5}
+.badge-purple{background:var(--purple-l);color:#534AB7}
+
+.search-wrap{display:flex;align-items:center;gap:9px;background:var(--surface);border-radius:var(--radius-xs);padding:10px 13px;margin:0 0 12px}
+.search-wrap i{font-size:18px;color:var(--text3);flex-shrink:0}
+.search-wrap input{flex:1;border:none;outline:none;font-size:14px;color:var(--text);background:transparent}
+
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{background:var(--surface2);color:var(--text2);border:1.5px solid var(--border);font-size:12px;font-weight:600;padding:7px 13px;border-radius:20px;cursor:pointer;transition:var(--transition);white-space:nowrap}
+.chip.on{background:var(--green-l);color:var(--green-d);border-color:var(--green)}
+.chip:active{transform:scale(.95)}
+
+.item-row{background:var(--surface);border-radius:var(--radius-sm);padding:13px 15px;display:flex;align-items:center;gap:13px;margin-bottom:9px;cursor:pointer;transition:var(--transition)}
+.item-row:active{opacity:.75;transform:scale(.98)}
+.item-emoji{width:46px;height:46px;background:var(--surface2);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.item-info{flex:1;min-width:0}
+.item-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-meta{font-size:12px;color:var(--text3);margin-top:2px}
+.item-right{text-align:right;flex-shrink:0}
+.item-qty{font-size:14px;font-weight:700}
+
+.skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--border) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px}
+@keyframes shimmer{to{background-position:-200% 0}}
+.skel-row{height:70px;border-radius:var(--radius-sm);margin-bottom:9px}
+
+#toast{position:fixed;bottom:calc(var(--nav-h) + 14px);left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:11px 20px;border-radius:13px;font-size:14px;font-weight:600;z-index:999;display:none;white-space:nowrap;max-width:90vw;text-align:center;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+[data-dark="true"] #toast{background:#fff;color:#1A1A1A}
+
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center;max-width:480px;left:50%;transform:translateX(-50%);width:100%}
+.modal-bg.open{display:flex;animation:fadeBg .2s ease}
+@keyframes fadeBg{from{opacity:0}to{opacity:1}}
+.sheet{background:var(--surface);border-radius:24px 24px 0 0;padding:22px 20px 36px;width:100%;max-height:92vh;overflow-y:auto;animation:slideUp .25s cubic-bezier(.4,0,.2,1)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.drag-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px}
+.sheet-title{font-size:19px;font-weight:800;margin-bottom:16px;letter-spacing:-.3px}
+
+.dialog-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;padding:20px;max-width:480px;left:50%;transform:translateX(-50%);width:100%}
+.dialog-bg.open{display:flex}
+.dialog{background:var(--surface);border-radius:20px;padding:24px;width:100%;max-width:380px;animation:popIn .2s cubic-bezier(.4,0,.2,1)}
+@keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.dialog h3{font-size:17px;font-weight:800;margin-bottom:8px}
+.dialog p{font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:20px}
+.dialog-btns{display:flex;gap:10px}
+.dialog-btns .btn{flex:1;padding:12px}
+
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 30px;text-align:center;gap:14px;min-height:60vh}
+.empty-icon{font-size:56px}
+.empty h3{font-size:17px;font-weight:700}
+.empty p{font-size:14px;color:var(--text3);line-height:1.6}
+
+#net-indicator{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--red);color:#fff;font-size:12px;font-weight:700;text-align:center;padding:6px;z-index:500;display:none}
+
+.ring-wrap{position:relative;width:80px;height:80px;margin:0 auto}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(255,255,255,.2);stroke-width:6}
+.ring-fg{fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .5s}
+
+#v-auth{background:var(--bg);display:flex}
+.auth-hero{background:linear-gradient(160deg,var(--green-d),var(--green));padding:52px 28px 40px;text-align:center;flex-shrink:0}
+.auth-logo{width:80px;height:80px;background:rgba(255,255,255,.18);border-radius:22px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:42px}
+.auth-hero h1{font-size:30px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.auth-hero p{font-size:14px;color:rgba(255,255,255,.75);margin-top:5px}
+.auth-body{background:var(--surface);border-radius:26px 26px 0 0;padding:28px 22px 36px;flex:1;overflow-y:auto;margin-top:-20px}
+.tab-row{display:flex;background:var(--surface2);border-radius:11px;padding:3px;margin-bottom:22px;gap:0}
+.tab-btn{flex:1;padding:9px;border-radius:9px;border:none;font-size:14px;font-weight:700;cursor:pointer;background:transparent;color:var(--text3);transition:var(--transition)}
+.tab-btn.on{background:var(--surface);color:var(--text)}
+.google-btn{width:100%;background:var(--surface2);color:var(--text);border:1.5px solid var(--border);border-radius:var(--radius-xs);padding:13px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;transition:var(--transition)}
+.divider{display:flex;align-items:center;gap:10px;margin:14px 0}
+.divider span{font-size:12px;color:var(--text3);white-space:nowrap}
+.divider::before,.divider::after{content:'';flex:1;height:.5px;background:var(--border)}
+.err-msg{color:var(--red);font-size:13px;text-align:center;margin-top:8px;display:none}
+
+.fridge-card{background:var(--green);border-radius:var(--radius);padding:18px;margin-bottom:14px;position:relative;overflow:hidden}
+.fridge-card::after{content:'';position:absolute;top:-30px;right:-30px;width:140px;height:140px;background:rgba(255,255,255,.08);border-radius:50%}
+.stat-grid{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:10px}
+.stat-div{width:1px;height:36px;background:rgba(255,255,255,.2)}
+.stat-num{font-size:26px;font-weight:800;color:#fff;text-align:center}
+.stat-lbl{font-size:11px;color:rgba(255,255,255,.7);text-align:center;margin-top:2px}
+.cap-bar-wrap{margin-top:14px}
+.cap-bar-lbl{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.7);margin-bottom:5px}
+.cap-bar{height:5px;background:rgba(255,255,255,.2);border-radius:3px}
+.cap-fill{height:100%;border-radius:3px;background:#fff;transition:width .5s}
+.section-lbl{font-size:11px;font-weight:700;letter-spacing:.7px;color:var(--text3);text-transform:uppercase;margin:16px 0 10px}
+.exp-scroll{display:flex;gap:9px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.exp-scroll::-webkit-scrollbar{display:none}
+.exp-chip{min-width:90px;background:var(--surface);border-radius:var(--radius-sm);padding:12px 10px;flex-shrink:0;cursor:pointer;transition:var(--transition)}
+.exp-chip:active{transform:scale(.95)}
+
+.recipe-card{background:var(--surface);border-radius:var(--radius);overflow:hidden;margin-bottom:13px;cursor:pointer;transition:var(--transition)}
+.recipe-card:active{opacity:.8;transform:scale(.98)}
+.recipe-thumb{height:110px;display:flex;align-items:center;justify-content:center;font-size:56px;position:relative}
+.recipe-match{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.5);color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:20px}
+.recipe-body{padding:14px}
+.recipe-title{font-size:16px;font-weight:800;margin-bottom:4px}
+.recipe-tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+
+.shop-row{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:.5px solid var(--border);cursor:pointer;transition:var(--transition)}
+.shop-check{width:22px;height:22px;border-radius:7px;border:2px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:var(--transition)}
+.shop-check.done-c{background:var(--green);border-color:var(--green)}
+.shop-row.done .shop-name{text-decoration:line-through;color:var(--text3)}
+
+.prof-avatar{width:72px;height:72px;border-radius:50%;background:var(--green-l);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:var(--green-d);overflow:hidden;cursor:pointer;flex-shrink:0}
+.prof-avatar img{width:100%;height:100%;object-fit:cover}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:.5px solid var(--border);cursor:pointer}
+.setting-row:last-child{border-bottom:none}
+.setting-left{display:flex;align-items:center;gap:12px}
+.setting-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.setting-label{font-size:15px;font-weight:600}
+.setting-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.toggle{width:44px;height:24px;background:var(--border);border-radius:12px;position:relative;cursor:pointer;transition:var(--transition);flex-shrink:0}
+.toggle.on{background:var(--green)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:var(--transition);box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle.on::after{left:calc(100% - 21px)}
+
+.emoji-grid{display:flex;flex-wrap:wrap;gap:7px}
+.emoji-btn{width:38px;height:38px;border-radius:9px;border:none;background:var(--surface2);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.emoji-btn.on{background:var(--green-l);outline:2px solid var(--green)}
+.emoji-btn:active{transform:scale(.9)}
+
+.ptr{display:flex;align-items:center;justify-content:center;height:0;overflow:hidden;transition:height .3s;color:var(--text3);font-size:13px;gap:8px}
+.ptr.show{height:48px}
+
+.spin{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:rotate .7s linear infinite;vertical-align:middle}
+@keyframes rotate{to{transform:rotate(360deg)}}
+.spin-dark{border-color:rgba(0,0,0,.15);border-top-color:var(--green)}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sep{height:.5px;background:var(--border);margin:12px 0}
+.cat-section-title{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin:18px 0 8px 0}
+
+.suggestions{position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);max-height:200px;overflow-y:auto;display:none;z-index:300}
+.suggestions div{padding:10px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.suggestions div:active{background:var(--surface2)}
+
+.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
+.confetti-piece{position:absolute;width:10px;height:10px;top:-10px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+.onboarding-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;color:#fff}
+.onboarding-overlay.active{display:flex}
+.onboarding-card{background:var(--surface);border-radius:var(--radius);padding:28px 24px;color:var(--text);max-width:320px;width:100%}
+.onboarding-card h3{margin-bottom:12px;font-size:20px}
+.onboarding-card p{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:20px}
+.onboarding-dots{display:flex;gap:6px;justify-content:center;margin-bottom:16px}
+.onboarding-dot{width:8px;height:8px;border-radius:50%;background:var(--border)}
+.onboarding-dot.active{background:var(--green)}
+
+.theme-colors{display:flex;gap:10px;flex-wrap:wrap}
+.theme-color-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);cursor:pointer;transition:var(--transition)}
+.theme-color-btn.active{border-color:var(--green);transform:scale(1.15)}
+
+@media(max-width:380px){.stat-num{font-size:22px}.topbar h2{font-size:18px}}
+</style>
+</head>
+<body>
+<div id="net-indicator">📡 You are offline — changes saved locally</div>
+<div id="app">
+
+  <!-- AUTH -->
+  <div class="view" id="v-auth" style="flex-direction:column;overflow-y:auto">
+    <div class="auth-hero">
+      <div class="auth-logo">
+        <svg width="72" height="72" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="60" cy="60" r="52" fill="white" opacity="0.15"/>
+          <path d="M30 65 Q20 70 25 78 Q30 72 40 68 Q35 58 42 55 Q50 52 58 54 Q70 58 82 54 Q98 48 104 44 Q102 52 96 58 Q88 66 76 72 Q64 78 52 78 Q38 78 30 72 Z" fill="white" opacity="0.9"/>
+          <circle cx="78" cy="50" r="3" fill="#1B5E3A"/>
+          <path d="M52 42 L57 50 L54 50 L54 56 L49 56 L49 50 L46 50 Z" fill="#4CAF50"/>
+          <path d="M20 60 Q15 55 18 50 Q20 48 22 50" stroke="white" stroke-width="2" fill="none"/>
+        </svg>
+      </div>
+      <h1>FreshFlow</h1>
+      <p id="auth-tagline">Eat fresh. Waste less. Live more.</p>
+    </div>
+    <div class="auth-body">
+      <div class="tab-row">
+        <button class="tab-btn on" id="tab-si" onclick="authTab('si')">Sign in</button>
+        <button class="tab-btn" id="tab-su" onclick="authTab('su')">Create account</button>
+      </div>
+      <div id="form-si">
+        <div class="field"><label>Email</label><input class="inp" id="si-email" type="email" placeholder="you@example.com" autocomplete="email"></div>
+        <div class="field"><label>Password</label><input class="inp" id="si-pass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+        <button class="btn" id="si-btn" onclick="doSignIn()"><span>Sign in</span></button>
+        <p class="err-msg" id="si-err"></p>
+      </div>
+      <div id="form-su" style="display:none">
+        <div class="row2">
+          <div class="field"><label>First name</label><input class="inp" id="su-fn" type="text" placeholder="Alex" autocomplete="given-name"></div>
+          <div class="field"><label>Last name</label><input class="inp" id="su-ln" type="text" placeholder="Tan" autocomplete="family-name"></div>
+        </div>
+        <div class="field"><label>Email</label><input class="inp" id="su-email" type="email" placeholder="you@example.com" autocomplete="email"></div>
+        <div class="field"><label>Password (min 6 chars)</label><input class="inp" id="su-pass" type="password" placeholder="••••••••" autocomplete="new-password"></div>
+        <div class="field"><label>Kitchen name</label><input class="inp" id="su-house" type="text" placeholder="e.g. Home Fridge, My Kitchen"></div>
+        <button class="btn" id="su-btn" onclick="doSignUp()"><span>Create account</span></button>
+        <p class="err-msg" id="su-err"></p>
+      </div>
+      <div class="divider"><span>or</span></div>
+      <button class="google-btn" onclick="doGoogleSignIn()">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.3 0 24 0 14.7 0 6.7 5.4 2.7 13.3l7.8 6C12.4 13.2 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8C43.5 37.5 46.5 31.4 46.5 24.5z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.5 10.8l8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.2 1.5-5 2.3-8.4 2.3-6.2 0-11.5-3.7-13.4-9l-8 6.1C6.7 42.6 14.7 48 24 48z"/></svg>
+        Continue with Google
+      </button>
+      <p style="font-size:12px;color:var(--text3);text-align:center;margin-top:16px;line-height:1.6">Your data is stored securely in Supabase.<br>Only you can access it.</p>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="view" id="v-home">
+    <div class="topbar">
+      <div>
+        <div style="font-size:12px;color:var(--text3)" id="h-greet">Good morning</div>
+        <h2 id="h-house" style="font-size:20px">My Kitchen</h2>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="icon-btn" onclick="toggleDark()" title="Dark mode"><i class="ti ti-moon"></i></button>
+        <button class="icon-btn" onclick="go('v-profile')" title="Profile">
+          <div id="h-avatar" style="width:30px;height:30px;border-radius:50%;background:var(--green-l);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--green-d)">?</div>
+        </button>
+      </div>
+    </div>
+    <div class="scroll px">
+      <div id="home-skeleton" style="display:none;">
+        <div class="skeleton" style="height:120px;margin-bottom:14px;border-radius:var(--radius);"></div>
+        <div class="skeleton" style="height:60px;margin-bottom:10px;border-radius:var(--radius-sm);"></div>
+        <div class="skeleton" style="height:60px;border-radius:var(--radius-sm);"></div>
+      </div>
+      <div class="ptr" id="home-ptr"><i class="ti ti-refresh spin-dark"></i> Refreshing…</div>
+      
+      <div id="h-tip-card" style="display:none;background:var(--green-l);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;font-size:13px;cursor:pointer" onclick="this.style.display='none'">
+        💡 <b>New to FreshFlow?</b> Add your first item with the + button in Inventory, then explore Recipes that match your fridge. Tap here to dismiss.
+      </div>
+      
+      <div class="fridge-card">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.6px;margin-bottom:12px" id="h-date"></div>
+        <div style="display:flex;align-items:center;gap:20px;margin-bottom:12px">
+          <div class="ring-wrap">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle class="ring-bg" cx="40" cy="40" r="34"/>
+              <circle class="ring-fg" id="ring-fg" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="0"/>
+            </svg>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-weight:800;font-size:18px" id="ring-text">0%</div>
+          </div>
+          <div style="flex:1">
+            <div class="stat-grid">
+              <div><div class="stat-num" id="h-tot">0</div><div class="stat-lbl" id="h-lbl-items">Items</div></div>
+              <div class="stat-div"></div>
+              <div><div class="stat-num" id="h-exp" style="color:#FAEEDA">0</div><div class="stat-lbl" id="h-lbl-exp">Expiring</div></div>
+              <div class="stat-div"></div>
+              <div><div class="stat-num" id="h-urg" style="color:#F7C1C1">0</div><div class="stat-lbl" id="h-lbl-urg">Expired</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="cap-bar-wrap">
+          <div class="cap-bar-lbl"><span>Freshness Score</span><span id="h-fresh-pct">0%</span></div>
+          <div class="cap-bar"><div class="cap-fill" id="h-fresh-fill" style="width:0"></div></div>
+        </div>
+        <div style="margin-top:10px;display:flex;justify-content:space-between;color:rgba(255,255,255,.8);font-size:13px">
+          <span>💸 Wasted <b id="h-saved">RM 0</b></span>
+        </div>
+      </div>
+
+      <div id="h-recent-section" style="display:none">
+        <div class="section-lbl">Recently Added</div>
+        <div class="exp-scroll" id="h-recent-list"></div>
+      </div>
+
+      <div class="section-lbl">Fridge Snapshot</div>
+      <div id="h-cat-snapshot" class="chips" style="margin-bottom:14px"></div>
+
+      <div class="section-lbl">This Week’s Expiry</div>
+      <div id="h-weekly-chart" style="display:flex;align-items:flex-end;gap:4px;height:60px;margin-bottom:14px;padding:0 4px"></div>
+
+      <div id="h-exp-section" style="display:none">
+        <div class="section-lbl" id="h-lbl-expiring">Expiring Soon</div>
+        <div class="exp-scroll" id="h-exp-list"></div>
+      </div>
+
+      <div id="h-recipe-of-day" style="display:none">
+        <div class="section-lbl">🌟 Recipe of the Day</div>
+        <div class="card" id="h-recipe-card"></div>
+      </div>
+
+      <div class="section-lbl" id="h-lbl-quickact">Quick Actions</div>
+      <div class="row2" style="margin-bottom:14px">
+        <div class="card-sm" style="cursor:pointer;display:flex;align-items:center;gap:10px" onclick="go('v-recipe')">
+          <div style="width:36px;height:36px;background:var(--purple-l);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✨</div>
+          <div><div style="font-size:13px;font-weight:700" id="h-lbl-rec">Recipes</div><div style="font-size:11px;color:var(--text3)" id="h-rec-cnt">0 ideas</div></div>
+        </div>
+        <div class="card-sm" style="cursor:pointer;display:flex;align-items:center;gap:10px" onclick="go('v-mealplan')">
+          <div style="width:36px;height:36px;background:var(--blue-l);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📅</div>
+          <div><div style="font-size:13px;font-weight:700" id="h-lbl-mp">Meal Plan</div><div style="font-size:11px;color:var(--text3)">Plan your week</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVENTORY -->
+  <div class="view" id="v-inv">
+    <div class="topbar">
+      <h2 id="inv-title">Inventory</h2>
+      <div style="display:flex;gap:8px">
+        <button class="icon-btn" id="barcode-btn" onclick="openBarcodeScanner()" title="Scan barcode"><i class="ti ti-barcode"></i></button>
+        <button class="icon-btn" onclick="openAddItem()" style="background:var(--green);color:#fff" title="Add item"><i class="ti ti-plus"></i></button>
+      </div>
+    </div>
+    <div class="px" style="padding-bottom:10px">
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input id="inv-search" type="text" placeholder="Search ingredients…" oninput="debounceInv()">
+        <button onclick="document.getElementById('inv-search').value=''; invCatFilter='All'; renderInvCatScroll(); debounceInv()" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:0"><i class="ti ti-x" style="font-size:16px"></i></button>
+      </div>
+      <div id="inv-cat-scroll" style="display:flex;gap:7px;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch"></div>
+    </div>
+    <div class="scroll px" id="inv-scroll">
+      <div class="ptr" id="inv-ptr"><i class="ti ti-refresh spin-dark"></i> Refreshing…</div>
+      <div id="inv-empty" style="display:none">
+        <div class="empty"><div class="empty-icon">🥬</div><h3 id="inv-empty-title">No items yet</h3><p id="inv-empty-sub">Add your first ingredient to start tracking freshness.</p><button class="btn btn-sm" onclick="openAddItem()" style="width:auto;padding:11px 22px"><i class="ti ti-plus"></i> Add item</button></div>
+      </div>
+      <div id="inv-list"></div>
+      <div style="height:10px"></div>
+    </div>
+  </div>
+
+  <!-- RECIPES -->
+  <div class="view" id="v-recipe">
+    <div class="topbar"><h2 id="rec-title">Recipes</h2></div>
+    <div class="scroll px">
+      <div id="rec-header" class="card" style="background:var(--purple);margin-bottom:14px">
+        <div style="font-size:11px;color:rgba(255,255,255,.75);font-weight:700;letter-spacing:.5px" id="rec-lbl-based">BASED ON YOUR FRIDGE</div>
+        <div style="font-size:19px;color:#fff;font-weight:800;margin:5px 0 3px" id="rec-count-lbl">0 recipes ready</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.75)" id="rec-sub-lbl">Tap any recipe to see full instructions</div>
+      </div>
+      <div id="cuisine-filter" style="display:flex;gap:7px;overflow-x:auto;padding-bottom:10px;margin-bottom:10px"></div>
+      <div id="rec-empty" style="display:none">
+        <div class="empty"><div class="empty-icon">🍳</div><h3 id="rec-empty-title">No recipes yet</h3><p id="rec-empty-sub">Add ingredients and we'll find meals you can cook.</p><button class="btn btn-sm" onclick="go('v-inv')" style="width:auto;padding:11px 22px">Add ingredients</button></div>
+      </div>
+      <div id="rec-list"></div>
+      <div style="height:10px"></div>
+    </div>
+  </div>
+
+  <!-- MEAL PLAN -->
+  <div class="view" id="v-mealplan">
+    <div class="topbar"><h2 id="mealplan-title">Meal Plan</h2></div>
+    <div class="scroll px">
+      <div id="meal-plan-grid"></div>
+      <button class="btn btn-danger btn-sm" style="margin-top:12px" onclick="clearMealPlan()">🗑️ Clear All Plans</button>
+    </div>
+  </div>
+
+  <!-- SHOPPING -->
+  <div class="view" id="v-shop">
+    <div class="topbar">
+      <h2 id="shop-title">Shopping List</h2>
+      <button class="icon-btn" onclick="clearDoneShop()" title="Clear checked"><i class="ti ti-trash"></i></button>
+    </div>
+    <div class="px" style="padding-bottom:10px">
+      <div class="section-lbl">Quick Add</div>
+      <div class="chips" style="margin-bottom:10px">
+        <div class="chip" onclick="quickAddShop('Milk')">🥛 Milk</div>
+        <div class="chip" onclick="quickAddShop('Eggs')">🥚 Eggs</div>
+        <div class="chip" onclick="quickAddShop('Bread')">🍞 Bread</div>
+        <div class="chip" onclick="quickAddShop('Butter')">🧈 Butter</div>
+        <div class="chip" onclick="quickAddShop('Chicken Breast')">🍗 Chicken</div>
+        <div class="chip" onclick="quickAddShop('Rice')">🍚 Rice</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+        <input class="inp" id="shop-inp" type="text" placeholder="Type item and tap Add…" style="flex:1;padding:11px 13px;font-size:14px" onkeydown="if(event.key==='Enter')addShopManual()">
+        <select class="inp" id="shop-cat-sel" style="width:108px;padding:10px 8px;font-size:13px"></select>
+        <button onclick="addShopManual()" style="background:var(--green);color:#fff;border:none;border-radius:var(--radius-xs);padding:11px 14px;font-weight:700;cursor:pointer;font-size:14px;white-space:nowrap;flex-shrink:0">+ Add</button>
+      </div>
+      <div style="background:var(--amber);border-radius:var(--radius-sm);padding:14px;margin-bottom:4px">
+        <div style="font-size:11px;color:rgba(255,255,255,.8);font-weight:700;letter-spacing:.5px" id="shop-lbl-tobuy">TO BUY</div>
+        <div id="shop-cnt" style="font-size:30px;font-weight:800;color:#fff">0</div>
+        <div id="shop-sub" style="font-size:12px;color:rgba(255,255,255,.75);margin-top:2px">items remaining</div>
+        <div id="shop-estimate" style="font-size:12px;color:rgba(255,255,255,.9);margin-top:6px">Total: RM 0</div>
+      </div>
+    </div>
+    <div class="scroll px" id="shop-scroll">
+      <div class="ptr" id="shop-ptr"><i class="ti ti-refresh spin-dark"></i> Refreshing…</div>
+      <div id="shop-empty" style="display:none">
+        <div class="empty"><div class="empty-icon">🛒</div><h3 id="shop-empty-title">List is empty</h3><p id="shop-empty-sub">Type an item above and tap Add.</p></div>
+      </div>
+      <div id="shop-list"></div>
+      <div style="height:10px"></div>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div class="view" id="v-alerts">
+    <div class="topbar"><h2 id="alerts-title">Alerts</h2></div>
+    <div class="scroll px">
+      <div id="alerts-empty" style="display:none">
+        <div class="empty"><div class="empty-icon">🔔</div><h3 id="alerts-empty-title">No alerts</h3><p id="alerts-empty-sub">Items expiring within 3 days will appear here.</p></div>
+      </div>
+      <div id="alerts-list"></div>
+    </div>
+  </div>
+
+  <!-- FAVORITES -->
+  <div class="view" id="v-favorites">
+    <div class="topbar"><h2 id="fav-title">Favorites</h2></div>
+    <div class="scroll px">
+      <div id="fav-empty" style="display:none">
+        <div class="empty"><div class="empty-icon">❤️</div><h3 id="fav-empty-title">No favorites yet</h3><p id="fav-empty-sub">Tap the heart icon on any recipe to save it here.</p></div>
+      </div>
+      <div id="fav-list"></div>
+      <div style="height:10px"></div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="view" id="v-profile">
+    <div class="topbar"><h2 id="prof-title">Profile</h2></div>
+    <div class="scroll px">
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+          <div class="prof-avatar" id="prof-av" onclick="pickProfilePhoto()">?</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:17px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="prof-name">—</div>
+            <div style="font-size:13px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis" id="prof-email">—</div>
+            <div style="font-size:12px;color:var(--green);margin-top:3px;font-weight:600" id="prof-badge">—</div>
+          </div>
+        </div>
+        <div class="sep" style="margin:0 0 14px"></div>
+        <div class="row2">
+          <div style="text-align:center;background:var(--surface2);border-radius:10px;padding:11px"><div id="prof-ic" style="font-size:20px;font-weight:800">0</div><div style="font-size:11px;color:var(--text3);margin-top:2px" id="prof-lbl-items">Items</div></div>
+          <div style="text-align:center;background:var(--surface2);border-radius:10px;padding:11px"><div id="prof-sc" style="font-size:20px;font-weight:800;color:var(--amber)">0</div><div style="font-size:11px;color:var(--text3);margin-top:2px" id="prof-lbl-shop">Shopping</div></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="field"><label id="prof-lbl-house">Kitchen name</label><input class="inp" id="p-house" type="text" placeholder="My Kitchen"></div>
+        <div class="field"><label id="prof-lbl-name">Display name</label><input class="inp" id="p-name" type="text" placeholder="Alex"></div>
+        <div class="field"><label>Average price per item (RM)</label><input class="inp" id="p-avg-price" type="number" step="0.01" min="0" placeholder="10"></div>
+        <button class="btn btn-sec" onclick="saveProfile()"><i class="ti ti-device-floppy"></i> <span id="prof-lbl-save">Save changes</span></button>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <button class="btn btn-sm" onclick="exportCSV(event)">📥 Export Inventory as CSV</button>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px">Theme Color</div>
+        <div class="theme-colors">
+          <div class="theme-color-btn" data-theme="" style="background:#389C9A" onclick="setTheme('')"></div>
+          <div class="theme-color-btn" data-theme="ocean" style="background:#0077B6" onclick="setTheme('ocean')"></div>
+          <div class="theme-color-btn" data-theme="sunset" style="background:#E76F51" onclick="setTheme('sunset')"></div>
+          <div class="theme-color-btn" data-theme="forest" style="background:#2D6A4F" onclick="setTheme('forest')"></div>
+          <div class="theme-color-btn" data-theme="berry" style="background:#9B5DE5" onclick="setTheme('berry')"></div>
+          <div class="theme-color-btn" data-theme="mono" style="background:#4A4E69" onclick="setTheme('mono')"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px" id="prof-lbl-cats">Categories</div>
+        <div id="prof-cats" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px"></div>
+        <div style="display:flex;gap:8px">
+          <input class="inp" id="new-cat-inp" type="text" placeholder="Add category…" style="flex:1;padding:9px 12px;font-size:13px">
+          <button onclick="addCategory()" style="background:var(--green);color:#fff;border:none;border-radius:var(--radius-xs);padding:0 14px;font-weight:700;cursor:pointer">+ Add</button>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="setting-row" onclick="switchLang('en')">
+          <div class="setting-left"><div class="setting-icon" style="background:var(--blue-l)">🇬🇧</div><div><div class="setting-label">English</div></div></div>
+          <i class="ti ti-check" id="lang-en-check" style="color:var(--green)"></i>
+        </div>
+        <div class="setting-row" onclick="switchLang('zh')">
+          <div class="setting-left"><div class="setting-icon" style="background:var(--red-l)">🇨🇳</div><div><div class="setting-label">中文 (简体)</div></div></div>
+          <i class="ti ti-check" id="lang-zh-check" style="color:var(--green);display:none"></i>
+        </div>
+        <div class="setting-row" onclick="switchLang('ms')">
+          <div class="setting-left"><div class="setting-icon" style="background:var(--green-l)">🇲🇾</div><div><div class="setting-label">Bahasa Melayu</div></div></div>
+          <i class="ti ti-check" id="lang-ms-check" style="color:var(--green);display:none"></i>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="setting-row" onclick="toggleDark()">
+          <div class="setting-left"><div class="setting-icon" style="background:var(--surface2)">🌙</div><div><div class="setting-label" id="prof-lbl-dark">Dark Mode</div></div></div>
+          <div class="toggle" id="dark-toggle"></div>
+        </div>
+        <div class="setting-row" onclick="confirmDeleteAccount()">
+          <div class="setting-left"><div class="setting-icon" style="background:var(--red-l)">⚠️</div><div><div class="setting-label color-red" id="prof-lbl-delacc">Delete Account</div></div></div>
+          <i class="ti ti-chevron-right" style="color:var(--text3)"></i>
+        </div>
+      </div>
+      <button class="btn btn-danger" onclick="doLogout()"><i class="ti ti-logout"></i> <span id="prof-lbl-logout">Sign out</span></button>
+      <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--text3)">FreshFlow v1.0 • Made with ❤️</div>
+      <div style="height:16px"></div>
+    </div>
+  </div>
+
+  <!-- RECIPE DETAIL -->
+  <div class="view" id="v-recdet">
+    <div class="topbar">
+      <button class="icon-btn" onclick="go('v-recipe')"><i class="ti ti-arrow-left"></i></button>
+      <h2 id="rd-title" style="flex:1;margin-left:8px">Recipe</h2>
+      <button class="icon-btn" id="rd-fav-btn" onclick="toggleFavorite(currentRecipeId)" title="Favorite"><i class="ti ti-heart" id="rd-fav-icon"></i></button>
+    </div>
+    <div class="scroll px" id="rd-body"></div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav id="bottom-nav">
+    <button class="nav-item" data-v="v-home" onclick="go('v-home')"><i class="ti ti-home"></i><span id="nav-lbl-home">Home</span></button>
+    <button class="nav-item" data-v="v-inv" onclick="go('v-inv')"><i class="ti ti-list"></i><span id="nav-lbl-inv">Inventory</span></button>
+    <button class="nav-item" data-v="v-recipe" onclick="go('v-recipe')"><i class="ti ti-sparkles"></i><span id="nav-lbl-rec">Recipes</span></button>
+    <button class="nav-item" data-v="v-mealplan" onclick="go('v-mealplan')"><i class="ti ti-calendar"></i><span id="nav-lbl-mp">Meal Plan</span></button>
+    <button class="nav-item" data-v="v-shop" onclick="go('v-shop')"><i class="ti ti-shopping-cart"></i><span id="nav-lbl-shop">Shop</span></button>
+    <button class="nav-item" data-v="v-alerts" onclick="go('v-alerts')"><i class="ti ti-bell"></i><span id="nav-lbl-alerts">Alerts</span></button>
+    <button class="nav-item" data-v="v-favorites" onclick="go('v-favorites')"><i class="ti ti-heart"></i><span id="nav-lbl-fav">Favorites</span></button>
+  </nav>
+</div>
+
+<!-- ADD/EDIT ITEM MODAL -->
+<div class="modal-bg" id="m-item">
+  <div class="sheet">
+    <div class="drag-handle"></div>
+    <div class="sheet-title" id="item-sheet-title">Add Ingredient</div>
+    <div style="margin-bottom:14px">
+      <button class="btn btn-sec btn-sm" onclick="openBarcodeScanner()" style="width:100%"><i class="ti ti-barcode"></i> Scan Barcode</button>
+      <div id="barcode-result" style="font-size:13px;color:var(--green);margin-top:6px;display:none"></div>
+    </div>
+    <div class="field"><label>Icon</label><div class="emoji-grid" id="emoji-grid"></div></div>
+    <div class="field"><label>Item name *</label>
+      <div style="position:relative">
+        <input class="inp" id="it-name" type="text" placeholder="e.g. Whole Milk, Chicken Breast…" oninput="showSuggestions(this.value)" autocomplete="off">
+        <div class="suggestions" id="suggestions"></div>
+      </div>
+    </div>
+    <div class="field"><label>Category *</label><div id="it-cats" class="chips" style="margin-bottom:8px"></div>
+      <div style="display:flex;gap:8px">
+        <input class="inp" id="it-newcat" type="text" placeholder="New category…" style="flex:1;padding:9px 12px;font-size:13px">
+        <button onclick="addCatFromItem()" style="background:var(--green);color:#fff;border:none;border-radius:var(--radius-xs);padding:0 13px;font-weight:700;cursor:pointer">Add</button>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Quantity</label><div style="display:flex;align-items:center;gap:7px"><button onclick="adjQty(-1)" style="width:30px;height:30px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:18px;cursor:pointer">−</button><span id="qty-v" style="font-size:18px;font-weight:800;min-width:28px;text-align:center">1</span><button onclick="adjQty(1)" style="width:30px;height:30px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:18px;cursor:pointer">+</button></div></div>
+      <div class="field"><label>Unit</label><select class="inp" id="it-unit"><option>pieces</option><option>gram</option><option>kg</option><option>litre</option><option>ml</option><option>pack</option><option>bottle</option><option>can</option><option>box</option><option>bag</option></select></div>
+    </div>
+    <div class="field"><label>Expiry Date *</label>
+      <input class="inp" id="it-exp" type="date">
+    </div>
+    <div class="field"><label>Notes (optional)</label><input class="inp" id="it-note" type="text"></div>
+    <button class="btn" id="it-save-btn" onclick="saveItem()"><span>Save to Fridge</span></button>
+    <button class="btn btn-danger" id="it-del-btn" style="margin-top:10px;display:none" onclick="confirmDeleteItem()">
+      <span>Delete this item</span>
+    </button>
+    <button class="btn btn-sec" id="it-archive-btn" style="margin-top:10px;display:none" onclick="archiveItem()"><i class="ti ti-check"></i> Mark as Consumed</button>
+    <button style="width:100%;background:none;border:none;color:var(--text3);font-size:14px;padding:12px;cursor:pointer;margin-top:4px" onclick="cancelItem()">Cancel</button>
+  </div>
+</div>
+
+<!-- BARCODE MODAL -->
+<div class="modal-bg" id="m-barcode">
+  <div class="sheet">
+    <div class="drag-handle"></div>
+    <div class="sheet-title">Scan Barcode</div>
+    <video id="bc-video" autoplay playsinline muted style="width:100%;border-radius:var(--radius-sm);background:#000;aspect-ratio:4/3;object-fit:cover;display:none"></video>
+    <div id="bc-status" style="text-align:center;margin-top:12px;font-size:14px;color:var(--text3)">Starting camera...</div>
+    <div class="divider"><span>or type manually</span></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <input class="inp" id="bc-manual" type="text" placeholder="Enter barcode number…" style="flex:1">
+      <button onclick="lookupBarcode(document.getElementById('bc-manual').value)" style="background:var(--green);color:#fff;border:none;border-radius:var(--radius-xs);padding:0 14px;font-weight:700;cursor:pointer">Look up</button>
+    </div>
+    <button style="width:100%;background:none;border:none;color:var(--text3);font-size:14px;padding:12px;cursor:pointer;margin-top:12px" onclick="startCamera()">📷 Try Camera Scan</button>
+    <button style="width:100%;background:none;border:none;color:var(--text3);font-size:14px;padding:12px;cursor:pointer;margin-top:4px" onclick="closeBarcodeScanner()">Cancel</button>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="dialog-bg" id="m-confirm">
+  <div class="dialog">
+    <h3 id="dialog-title">Confirm</h3>
+    <p id="dialog-msg">Are you sure?</p>
+    <div class="dialog-btns">
+      <button class="btn btn-sec" onclick="closeDialog()">Cancel</button>
+      <button class="btn btn-danger" id="dialog-ok-btn" onclick="dialogOkAction()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- UNDO SNACKBAR -->
+<div id="undo-snackbar" style="display:none;position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:12px 20px;border-radius:13px;z-index:1000;align-items:center;gap:15px;white-space:nowrap;">
+  <span id="undo-msg"></span>
+  <button id="undo-btn" style="background:var(--green);color:#fff;border:none;padding:6px 14px;border-radius:8px;font-weight:700;cursor:pointer;">Undo</button>
+</div>
+
+<!-- ONBOARDING OVERLAY -->
+<div class="onboarding-overlay" id="onboarding-overlay">
+  <div class="onboarding-card">
+    <h3 id="onboarding-title">Welcome to FreshFlow!</h3>
+    <p id="onboarding-text">Add your ingredients, discover recipes, and plan meals effortlessly.</p>
+    <div class="onboarding-dots">
+      <div class="onboarding-dot active" id="onboarding-dot-0"></div>
+      <div class="onboarding-dot" id="onboarding-dot-1"></div>
+      <div class="onboarding-dot" id="onboarding-dot-2"></div>
+    </div>
+    <button class="btn" onclick="nextOnboarding()" id="onboarding-next">Next</button>
+  </div>
+</div>
+
+<!-- AVATAR PICKER MODAL -->
+<div class="modal-bg" id="m-avatar">
+  <div class="sheet">
+    <div class="drag-handle"></div>
+    <div class="sheet-title">Choose Food Avatar</div>
+    <div id="avatar-emoji-grid" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;font-size:40px;padding:10px"></div>
+    <button style="width:100%;background:none;border:none;color:var(--text3);font-size:14px;padding:12px;cursor:pointer;margin-top:8px" onclick="closeModal('m-avatar')">Cancel</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div class="confetti-container" id="confetti-container"></div>
+
+<script>
+'use strict';
+
+const CONFIG = {
+  SUPABASE_URL: 'https://qzzmisvsmolojchkfcja.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6em1pc3ZzbW9sb2pjaGtmY2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5OTA4NjUsImV4cCI6MjA5NDU2Njg2NX0.1vphk-48S_io12FZjfvoC80rHWyNEW6N3Lm6XqkeUO8',
+  LS_KEYS: {
+    LANG: 'ff-lang',
+    DARK: 'ff-dark',
+    THEME: 'ff-theme',
+    MEALPLAN: 'ff-mealplan',
+    ONBOARDED: 'ff-onboarded',
+    FAVORITES: 'ff-favorites'
+  }
+};
+
+const SB = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+
+const LOCALE = {
+  en:{ signIn:'Sign in', createAcc:'Create account', home:'Home', inventory:'Inventory', recipes:'Recipes', mealPlan:'Meal Plan', shopping:'Shopping', alerts:'Alerts', profile:'Profile', save:'Save', addItem:'Add Item', editItem:'Edit Item', delete:'Delete', cancel:'Cancel', noItems:'No items yet', noShop:'List is empty', noRecipes:'No recipes yet', noAlerts:'No alerts', saved:'Saved', expired:'Expired', freshness:'Freshness', toBuy:'To buy', search:'Search...', addIngredient:'Add Ingredient', updateItem:'Update Item', markConsumed:'Mark Consumed', goodMorning:'Good morning ☀️', goodAfternoon:'Good afternoon 🌤', goodEvening:'Good evening 🌙', basedOnFridge:'Based on your fridge', recipesReady:'recipes ready', tagline:'Eat fresh. Waste less. Live more.', saveToFridge:'Save to Fridge', areYouSure:'Are you sure?', ingredients:'Ingredients', stepByStep:'Step By Step', favorites:'Favorites' },
+  zh:{ signIn:'登录', createAcc:'创建账户', home:'首页', inventory:'库存', recipes:'食谱', mealPlan:'膳食计划', shopping:'购物', alerts:'提醒', profile:'个人资料', save:'保存', addItem:'添加食材', editItem:'编辑食材', delete:'删除', cancel:'取消', noItems:'暂无食材', noShop:'列表为空', noRecipes:'暂无食谱', noAlerts:'暂无提醒', saved:'节省', expired:'已过期', freshness:'新鲜度', toBuy:'待购买', search:'搜索...', addIngredient:'添加食材', updateItem:'更新食材', markConsumed:'标记已食用', goodMorning:'早上好 ☀️', goodAfternoon:'下午好 🌤', goodEvening:'晚上好 🌙', basedOnFridge:'根据冰箱', recipesReady:'个食谱可做', tagline:'新鲜食材，减少浪费，生活更美好。', saveToFridge:'保存至冰箱', areYouSure:'确定要删除吗？', ingredients:'食材', stepByStep:'步骤', favorites:'收藏' },
+  ms:{ signIn:'Log masuk', createAcc:'Buat akaun', home:'Utama', inventory:'Inventori', recipes:'Resipi', mealPlan:'Rancang Makan', shopping:'Beli-belah', alerts:'Amaran', profile:'Profil', save:'Simpan', addItem:'Tambah Item', editItem:'Edit Item', delete:'Padam', cancel:'Batal', noItems:'Tiada item', noShop:'Senarai kosong', noRecipes:'Tiada resipi', noAlerts:'Tiada amaran', saved:'Jimat', expired:'Tamat tempoh', freshness:'Kesegaran', toBuy:'Untuk beli', search:'Cari...', addIngredient:'Tambah Bahan', updateItem:'Kemas kini', markConsumed:'Tanda guna', goodMorning:'Selamat pagi ☀️', goodAfternoon:'Selamat tengah hari 🌤', goodEvening:'Selamat malam 🌙', basedOnFridge:'Berdasarkan peti sejuk', recipesReady:'resipi tersedia', tagline:'Makan segar. Kurang sisa. Hidup lebih baik.', saveToFridge:'Simpan ke Peti Sejuk', areYouSure:'Adakah anda pasti?', ingredients:'Bahan-bahan', stepByStep:'Langkah demi langkah', favorites:'Kegemaran' }
+};
+let LANG = localStorage.getItem(CONFIG.LS_KEYS.LANG) || 'en';
+function t(k) { return LOCALE[LANG]?.[k] || LOCALE.en[k] || k; }
+
+let currentUser = null, userProfile = null, fridgeItems = [], shopItems = [];
+let currentView = 'v-auth', editItemId = null, addQtyVal = 1, selectedEmoji = '🥛', selectedCat = 'Dairy';
+let darkMode = localStorage.getItem(CONFIG.LS_KEYS.DARK) === 'true';
+let currentTheme = localStorage.getItem(CONFIG.LS_KEYS.THEME) || '';
+let bcStream = null, bcDetector = null;
+let mealPlan = JSON.parse(localStorage.getItem(CONFIG.LS_KEYS.MEALPLAN)) || {};
+let recipeCuisineFilter = 'All';
+let onboardingStep = 0;
+let currentRecipeId = null;
+let favoriteIds = JSON.parse(localStorage.getItem(CONFIG.LS_KEYS.FAVORITES) || '[]');
+
+const FOOD_PRICE_DB = {
+  'chicken': 10.00, 'chicken breast': 16.00, 'milk': 6.50, 'egg': 0.45, 'cheese': 35.00,
+  'apple': 10.00, 'banana': 4.50, 'rice': 4.50, 'bread': 4.00, 'butter': 18.00,
+  'tomato': 5.10, 'onion': 4.00, 'garlic': 10.60, 'potato': 3.50, 'carrot': 5.00
+};
+
+function estimateItemPrice(itemName, quantity, unit) {
+  const nameLower = itemName.toLowerCase().trim();
+  let bestMatch = FOOD_PRICE_DB[nameLower] || 10;
+  let factor = 1;
+  const unitLower = (unit || '').toLowerCase();
+  if (unitLower === 'gram' || unitLower === 'g') factor = 1/1000;
+  else if (unitLower === 'ml') factor = 1/1000;
+  else if (unitLower === 'pieces' || unitLower === 'piece' && !nameLower.includes('egg')) factor = 0.5;
+  return bestMatch * (quantity || 1) * factor;
+}
+
+const INGREDIENT_DB = [
+  {en:'Milk',zh:'牛奶',ms:'Susu',emoji:'🥛'},{en:'Egg',zh:'鸡蛋',ms:'Telur',emoji:'🥚'},
+  {en:'Chicken Breast',zh:'鸡胸肉',ms:'Dada ayam',emoji:'🍗'},{en:'Beef',zh:'牛肉',ms:'Daging',emoji:'🥩'},
+  {en:'Salmon',zh:'三文鱼',ms:'Salmon',emoji:'🐟'},{en:'Carrot',zh:'胡萝卜',ms:'Lobak',emoji:'🥕'},
+  {en:'Broccoli',zh:'西兰花',ms:'Brokoli',emoji:'🥦'},{en:'Tomato',zh:'番茄',ms:'Tomato',emoji:'🍅'},
+  {en:'Onion',zh:'洋葱',ms:'Bawang',emoji:'🧅'},{en:'Garlic',zh:'蒜',ms:'Bawang putih',emoji:'🧄'}
+];
+function showSuggestions(val) {
+  const sug = document.getElementById('suggestions');
+  if (!val) { sug.style.display = 'none'; return; }
+  const filtered = INGREDIENT_DB.filter(i => Object.values(i).some(v => v.toLowerCase().includes(val.toLowerCase()))).slice(0,6);
+  sug.innerHTML = filtered.map(i => `<div onclick="selectSuggestion('${i.en.replace(/'/g,"\\'")}','${i.emoji}')">${i.emoji} ${i[LANG]||i.en}</div>`).join('');
+  sug.style.display = filtered.length ? 'block' : 'none';
+}
+function selectSuggestion(nameEn, emoji) {
+  const ing = INGREDIENT_DB.find(i => i.en === nameEn);
+  document.getElementById('it-name').value = ing ? (ing[LANG]||ing.en) : nameEn;
+  selectedEmoji = emoji;
+  buildEmojiGrid();
+  document.getElementById('suggestions').style.display = 'none';
+}
+
+const RECIPES = (() => {
+  const bases = [
+    { en:'Egg Fried Rice', zh:'蛋炒饭', ms:'Nasi Goreng Telur', emoji:'🍳', cuisine:'Chinese', needs:['egg','rice','onion','soy sauce'], ing:['2 eggs','1 cup cooked rice','½ onion, diced','2 tbsp soy sauce','1 tbsp cooking oil'], steps:['Heat oil in wok over high heat.','Sauté onion until translucent.','Push onion aside, pour beaten eggs into the center and scramble.','Add rice, break up clumps, and stir-fry for 2 minutes.','Drizzle soy sauce around the edges, toss everything together for 1 minute.','Serve hot, garnished with spring onion if desired.'], tip:'Day-old rice works best to prevent sogginess.', time:'15 min', diff:'Easy' },
+    { en:'Kung Pao Chicken', zh:'宫保鸡丁', ms:'Ayam Kung Pao', emoji:'🥜', cuisine:'Chinese', needs:['chicken','peanut','soy sauce','garlic','chilli'], ing:['200g chicken breast, diced','¼ cup roasted peanuts','3 dried chillies, snipped','3 garlic cloves, sliced','1 tbsp soy sauce','1 tsp vinegar','1 tsp sugar','2 tbsp oil'], steps:['Mix soy sauce, vinegar, and sugar in a small bowl; set aside.','Heat oil in wok, stir-fry dried chillies and garlic until fragrant.','Add diced chicken and cook until white and sealed, about 3 minutes.','Pour in the sauce mixture and toss to coat the chicken evenly.','Stir in peanuts and cook for 1 more minute.','Serve immediately with steamed rice.'], tip:'Adjust chillies to your preferred spice level.', time:'20 min', diff:'Medium' },
+    { en:'Mapo Tofu', zh:'麻婆豆腐', ms:'Tauhu Mapo', emoji:'🌶️', cuisine:'Chinese', needs:['tofu','pork','garlic','soy sauce','chilli'], ing:['300g silken tofu, cubed','100g minced pork','2 tbsp doubanjiang (chilli bean paste)','3 garlic cloves, minced','1 tsp Sichuan peppercorn powder','2 tbsp soy sauce','1 tbsp oil','Spring onion for garnish'], steps:['Gently blanch tofu cubes in salted boiling water for 2 minutes; drain.','Heat oil in wok, stir-fry minced pork until browned.','Add garlic and doubanjiang, stir-fry until fragrant.','Pour in ½ cup water and soy sauce, bring to a simmer.','Slide in tofu, gently stir, and simmer 5 minutes.','Sprinkle Sichuan peppercorn powder and spring onion before serving.'], tip:'Handle tofu gently to keep the cubes intact.', time:'25 min', diff:'Medium' },
+    { en:'Sweet and Sour Pork', zh:'咕噜肉', ms:'Daging Masam Manis', emoji:'🍍', cuisine:'Chinese', needs:['pork','pineapple','bell pepper','onion','ketchup'], ing:['200g pork loin, cubed','1 cup pineapple chunks','½ green bell pepper, cut into pieces','½ onion, wedged','3 tbsp ketchup','2 tbsp vinegar','2 tbsp sugar','Cornstarch for coating','Oil for frying'], steps:['Coat pork cubes with cornstarch and deep-fry until golden and crispy; drain.','Mix ketchup, vinegar, and sugar in a bowl to make the sauce.','Stir-fry onion and bell pepper in a little oil for 2 minutes.','Add pineapple chunks and the sweet-sour sauce; bring to a boil.','Toss in crispy pork and stir until evenly coated.','Serve immediately with rice.'], tip:'Double-fry the pork for extra crispiness.', time:'25 min', diff:'Medium' },
+    { en:'Beef Chow Fun', zh:'干炒牛河', ms:'Kway Teow Goreng Daging', emoji:'🍜', cuisine:'Chinese', needs:['beef','rice noodles','onion','soy sauce','garlic'], ing:['150g beef, thinly sliced','200g fresh flat rice noodles','½ onion, sliced','3 garlic cloves, minced','2 tbsp dark soy sauce','1 tbsp light soy sauce','1 tbsp oil','Bean sprouts (optional)'], steps:['Heat oil in wok, stir-fry beef until just browned; set aside.','In the same wok, sauté garlic and onion until fragrant.','Add rice noodles and spread them out; let them sear for 1 minute without stirring.','Pour soy sauces over noodles, toss with beef and bean sprouts.','Stir-fry on high heat for 2 minutes, ensuring noodles are well coated.','Serve hot as a main dish.'], tip:'Use high heat and don’t overcrowd the wok for best results.', time:'20 min', diff:'Medium' },
+    { en:'Stir-Fried Green Vegetables', zh:'清炒时蔬', ms:'Sayur Goreng', emoji:'🥬', cuisine:'Chinese', needs:['lettuce','garlic','oyster sauce','oil'], ing:['300g leafy greens (choy sum, lettuce, or spinach)','3 garlic cloves, sliced','1 tbsp oyster sauce','1 tbsp oil','Pinch of salt'], steps:['Wash and drain greens thoroughly.','Heat oil in wok, sauté garlic until golden.','Add greens and stir-fry on high heat until wilted, about 2 minutes.','Drizzle oyster sauce and a pinch of salt; toss to combine.','Remove from heat immediately to keep the crunch.','Serve as a side dish.'], tip:'Do not overcook; greens should remain bright and slightly crisp.', time:'10 min', diff:'Easy' },
+    { en:'Classic Margherita Pizza', zh:'玛格丽特披萨', ms:'Pizza Margherita', emoji:'🍕', cuisine:'Western', needs:['flour','tomato','cheese','olive oil'], ing:['1 pizza dough base','3 tbsp tomato sauce','125g fresh mozzarella, sliced','Fresh basil leaves','1 tbsp olive oil','Salt'], steps:['Preheat oven to 250°C (or highest setting).','Spread tomato sauce evenly over the dough.','Arrange mozzarella slices on top, drizzle with olive oil.','Bake for 10-12 minutes until crust is golden and cheese bubbles.','Remove from oven, scatter fresh basil leaves.','Slice and serve immediately.'], tip:'A pizza stone or preheated tray gives a crispier crust.', time:'15 min', diff:'Easy' },
+    { en:'Spaghetti Bolognese', zh:'意式肉酱面', ms:'Spaghetti Bolognese', emoji:'🍝', cuisine:'Western', needs:['pasta','beef','tomato','onion','garlic'], ing:['200g spaghetti','200g minced beef','1 can chopped tomatoes','1 onion, diced','2 garlic cloves, minced','1 tbsp olive oil','Salt, pepper, dried oregano'], steps:['Cook spaghetti according to packet directions; drain and reserve some pasta water.','Heat olive oil in a pan, sauté onion and garlic until soft.','Add minced beef and cook until browned, breaking up lumps.','Pour in chopped tomatoes, season with salt, pepper, and oregano; simmer 15 minutes.','Toss cooked spaghetti with the Bolognese sauce, adding pasta water if needed.','Serve with grated Parmesan cheese.'], tip:'Simmer the sauce longer for deeper flavour.', time:'30 min', diff:'Easy' },
+    { en:'Pan-Seared Chicken Breast', zh:'香煎鸡胸肉', ms:'Dada Ayam Goreng', emoji:'🍗', cuisine:'Western', needs:['chicken','garlic','butter','lemon'], ing:['2 chicken breasts','2 garlic cloves, crushed','1 tbsp butter','Juice of ½ lemon','Salt, black pepper','1 tbsp olive oil'], steps:['Season chicken breasts with salt and pepper on both sides.','Heat olive oil in a skillet over medium-high heat.','Sear chicken for 6-7 minutes per side until golden and cooked through.','Add butter and garlic to the pan; baste chicken with the melted butter.','Squeeze lemon juice over the chicken and let it rest for 5 minutes.','Slice and serve with pan juices drizzled on top.'], tip:'Letting the chicken rest keeps it juicy.', time:'20 min', diff:'Easy' },
+    { en:'Greek Salad', zh:'希腊沙拉', ms:'Salad Greek', emoji:'🥗', cuisine:'Western', needs:['tomato','cucumber','onion','olive','cheese'], ing:['3 large tomatoes, cut into wedges','1 cucumber, sliced','½ red onion, thinly sliced','100g feta cheese, crumbled','A handful of Kalamata olives','2 tbsp extra-virgin olive oil','1 tsp dried oregano','Salt'], steps:['Combine tomatoes, cucumber, and red onion in a large bowl.','Add olives and crumbled feta cheese on top.','Drizzle generously with olive oil.','Sprinkle dried oregano and a pinch of salt.','Toss gently just before serving.','Enjoy as a refreshing side or light meal.'], tip:'Use the best quality olive oil you can find — it makes all the difference.', time:'10 min', diff:'Easy' },
+    { en:'Garlic Butter Shrimp', zh:'蒜香黄油虾', ms:'Udang Mentega Bawang Putih', emoji:'🦐', cuisine:'Western', needs:['shrimp','garlic','butter','lemon'], ing:['300g shrimp, peeled and deveined','4 garlic cloves, minced','2 tbsp butter','Juice of ½ lemon','Salt, black pepper','Fresh parsley, chopped'], steps:['Season shrimp with salt and pepper.','Melt butter in a pan over medium heat.','Add garlic and sauté for 30 seconds until fragrant.','Add shrimp and cook for 2-3 minutes per side until pink.','Squeeze lemon juice over the shrimp and toss with parsley.','Serve immediately as an appetizer or main.'], tip:'Do not overcook shrimp — they turn rubbery quickly.', time:'10 min', diff:'Easy' },
+    { en:'French Toast', zh:'法式吐司', ms:'Roti Bakar Perancis', emoji:'🍞', cuisine:'Western', needs:['bread','egg','milk','butter'], ing:['4 thick slices of bread','2 large eggs','½ cup milk','1 tsp vanilla extract','1 tbsp butter','Maple syrup or honey for serving'], steps:['Whisk eggs, milk, and vanilla extract in a shallow bowl.','Heat butter in a non-stick skillet over medium heat.','Dip each bread slice into the egg mixture, letting it soak for a few seconds.','Cook bread for 2-3 minutes per side until golden brown.','Serve immediately with maple syrup, honey, or fresh fruit.'], tip:'Slightly stale bread absorbs the egg mixture better without falling apart.', time:'10 min', diff:'Easy' },
+    { en:'Caesar Salad', zh:'凯撒沙拉', ms:'Salad Caesar', emoji:'🥬', cuisine:'Western', needs:['lettuce','cheese','crouton','mayonnaise','garlic'], ing:['1 head romaine lettuce, chopped','50g Parmesan cheese, shaved','1 cup croutons','3 tbsp mayonnaise','1 garlic clove, minced','Juice of ½ lemon','1 tsp Worcestershire sauce'], steps:['Make the dressing: whisk together mayonnaise, garlic, lemon juice, and Worcestershire sauce.','Place chopped lettuce in a large bowl.','Pour dressing over lettuce and toss until evenly coated.','Add croutons and most of the Parmesan; toss again.','Top with remaining Parmesan shavings.','Serve immediately as a starter.'], tip:'Chill the lettuce beforehand for a crisp, refreshing salad.', time:'10 min', diff:'Easy' },
+    { en:'Nasi Goreng Kampung', zh:'乡村炒饭', ms:'Nasi Goreng Kampung', emoji:'🍚', cuisine:'Southeast Asian', needs:['rice','anchovies','chilli','onion','egg'], ing:['2 cups cold rice','½ cup dried anchovies','2 bird\'s eye chillies, sliced','1 shallot, sliced','2 eggs','2 tbsp oil','Salt to taste'], steps:['Fry dried anchovies in hot oil until crispy; drain and set aside.','Sauté shallot and chillies in the same oil until fragrant.','Push aside, crack eggs and scramble until just set.','Add rice, stir-fry on high heat, breaking up any clumps.','Return crispy anchovies to the wok, toss to combine.','Season with salt and serve with a fried egg on top.'], tip:'Cold rice is essential for fried rice; fresh rice will turn mushy.', time:'15 min', diff:'Easy' },
+    { en:'Pad Thai', zh:'泰式炒河粉', ms:'Pad Thai', emoji:'🍜', cuisine:'Southeast Asian', needs:['rice noodles','shrimp','egg','peanut','tamarind'], ing:['200g flat rice noodles, soaked','150g shrimp','2 eggs','¼ cup roasted peanuts, crushed','2 tbsp tamarind paste','1 tbsp fish sauce','1 tbsp sugar','Bean sprouts, lime wedge'], steps:['Soak noodles in warm water until pliable, about 20 minutes; drain.','Stir-fry shrimp until pink; push to side.','Crack eggs into the pan, scramble lightly.','Add noodles, tamarind, fish sauce, and sugar; toss until noodles are coated.','Add bean sprouts and toss for 30 seconds.','Serve garnished with crushed peanuts and a lime wedge.'], tip:'Tamarind paste gives the authentic sweet-sour balance.', time:'25 min', diff:'Medium' },
+    { en:'Thai Green Curry', zh:'泰式青咖喱', ms:'Kari Hijau Thai', emoji:'🍛', cuisine:'Southeast Asian', needs:['chicken','coconut milk','curry powder','garlic','fish sauce'], ing:['300g chicken thigh, sliced','1 can coconut milk','2 tbsp green curry paste','1 cup bamboo shoots','4 kaffir lime leaves','1 tbsp fish sauce','1 tsp sugar','Thai basil leaves'], steps:['Heat a little coconut cream (the thick part) in a wok; stir-fry green curry paste until fragrant.','Add chicken and cook until sealed.','Pour in remaining coconut milk, bamboo shoots, and kaffir lime leaves.','Simmer for 15 minutes until chicken is tender.','Season with fish sauce and sugar; stir in Thai basil.','Serve with steamed jasmine rice.'], tip:'Use the thick coconut cream first to fry the paste for deeper flavour.', time:'30 min', diff:'Medium' },
+    { en:'Vietnamese Pho', zh:'越南牛肉粉', ms:'Pho Vietnam', emoji:'🍵', cuisine:'Southeast Asian', needs:['noodles','beef','onion','ginger','fish sauce'], ing:['200g flat rice noodles','150g beef sirloin, thinly sliced','1L beef broth','1 onion, halved','3cm ginger, sliced','2 star anise','1 cinnamon stick','Fish sauce, hoisin, bean sprouts, herbs'], steps:['Char onion and ginger under a broiler or over an open flame until blackened.','Simmer beef broth with charred onion, ginger, star anise, and cinnamon for 30 minutes.','Strain broth and season with fish sauce to taste.','Cook rice noodles according to package, drain, and divide into bowls.','Arrange raw beef slices on top of noodles.','Pour boiling broth over the beef (it will cook instantly). Serve with bean sprouts and herbs.'], tip:'Slice beef as thin as possible — it cooks in the hot broth.', time:'45 min', diff:'Medium' },
+    { en:'Chicken Satay', zh:'鸡肉沙爹', ms:'Sate Ayam', emoji:'🍢', cuisine:'Southeast Asian', needs:['chicken','peanut butter','soy sauce','garlic','coconut milk'], ing:['300g chicken breast, cut into strips','Bamboo skewers, soaked','3 tbsp peanut butter','2 tbsp soy sauce','2 garlic cloves, minced','½ cup coconut milk','1 tsp curry powder'], steps:['Mix peanut butter, soy sauce, garlic, coconut milk, and curry powder to make the marinade.','Thread chicken strips onto soaked skewers.','Marinate chicken for at least 30 minutes (overnight is best).','Grill or pan-fry skewers over medium heat, turning occasionally, until cooked through.','Brush with remaining marinade while cooking.','Serve with cucumber slices and extra peanut sauce.'], tip:'Soak bamboo skewers in water for 30 minutes to prevent burning.', time:'30 min', diff:'Easy' },
+    { en:'Teriyaki Chicken', zh:'照烧鸡腿', ms:'Ayam Teriyaki', emoji:'🍗', cuisine:'Japanese', needs:['chicken','soy sauce','sugar','ginger','garlic'], ing:['2 chicken legs, boneless','3 tbsp soy sauce','2 tbsp mirin','1 tbsp sugar','1 tsp ginger, grated','1 garlic clove, minced','1 tbsp oil'], steps:['Mix soy sauce, mirin, sugar, ginger, and garlic to make the teriyaki sauce.','Heat oil in a pan, place chicken skin-side down, and cook until crispy.','Flip chicken and pour teriyaki sauce into the pan.','Simmer, basting chicken with sauce, until sauce thickens and chicken is cooked.','Let chicken rest for a few minutes, then slice.','Drizzle remaining sauce over the sliced chicken and serve with rice.'], tip:'Mirin adds authentic Japanese sweetness; substitute with 1 tbsp honey if needed.', time:'20 min', diff:'Easy' },
+    { en:'Miso Soup', zh:'味噌汤', ms:'Sup Miso', emoji:'🍵', cuisine:'Japanese', needs:['tofu','seaweed','miso','onion'], ing:['150g silken tofu, cubed','2 tbsp miso paste','1 sheet dried wakame seaweed','2 cups dashi stock','1 green onion, sliced'], steps:['Soak wakame in water for 5 minutes until rehydrated; drain.','Bring dashi stock to a gentle simmer in a pot.','Add tofu cubes and wakame; simmer for 2 minutes.','Turn off heat. Dissolve miso paste in a ladleful of hot broth, then stir back into the pot.','Never boil miso — it destroys the flavour.','Serve garnished with sliced green onion.'], tip:'Add miso off the heat to preserve its delicate flavour.', time:'10 min', diff:'Easy' },
+    { en:'Bibimbap', zh:'韩式拌饭', ms:'Bibimbap', emoji:'🍚', cuisine:'Korean', needs:['rice','egg','carrot','mushroom','beef'], ing:['2 cups cooked rice','100g beef mince','1 carrot, julienned','5 shiitake mushrooms, sliced','1 egg','1 tbsp gochujang (Korean chilli paste)','1 tsp sesame oil','Sesame seeds'], steps:['Sauté carrot and mushrooms separately in a little oil; set aside.','Cook beef mince with soy sauce and garlic until browned.','Fry an egg sunny-side up.','Place rice in a bowl, arrange vegetables and beef on top.','Place the fried egg in the center.','Serve with gochujang and a drizzle of sesame oil; mix everything before eating.'], tip:'The mixing is part of the experience — bibimbap literally means "mixed rice."', time:'25 min', diff:'Easy' },
+    { en:'Japanese Curry Rice', zh:'日式咖喱饭', ms:'Kari Jepun', emoji:'🍛', cuisine:'Japanese', needs:['chicken','potato','carrot','onion','curry powder'], ing:['200g chicken thigh, cubed','2 potatoes, cubed','1 carrot, sliced','1 onion, diced','3 tbsp curry powder','2 tbsp flour','2 cups water','1 tbsp oil','Cooked rice'], steps:['Heat oil in a pot, sauté onion until translucent.','Add chicken and cook until sealed.','Add potato and carrot, stir for 2 minutes.','Sprinkle flour and curry powder, stir to coat everything.','Add water, bring to boil, then simmer for 20 minutes until vegetables are tender.','Serve over steamed rice.'], tip:'Japanese curry is thicker and milder than Indian curries.', time:'35 min', diff:'Easy' },
+    { en:'Shakshuka', zh:'北非蛋', ms:'Shakshuka', emoji:'🍳', cuisine:'Mediterranean', needs:['tomato','egg','onion','garlic','chilli'], ing:['1 can diced tomatoes','4 eggs','1 onion, diced','2 garlic cloves, minced','1 tsp cumin','1 tsp paprika','Pinch of chilli flakes','Fresh parsley'], steps:['Sauté onion and garlic in olive oil until soft.','Add cumin, paprika, and chilli flakes; cook 1 minute.','Pour in diced tomatoes, simmer for 10 minutes until thickened.','Make 4 wells in the sauce and crack an egg into each.','Cover and cook on low heat until egg whites are set but yolks remain runny.','Garnish with fresh parsley and serve with crusty bread.'], tip:'Use a fork to gently swirl the egg whites into the sauce without breaking the yolks.', time:'20 min', diff:'Easy' },
+    { en:'Falafel Wrap', zh:'法拉费卷饼', ms:'Balut Falafel', emoji:'🧆', cuisine:'Mediterranean', needs:['chickpea','onion','garlic','flour','cumin'], ing:['1 can chickpeas, drained','1 onion, roughly chopped','3 garlic cloves','2 tbsp flour','1 tsp cumin','1 tsp coriander','Oil for frying','Pita bread, lettuce, tomato, tahini sauce'], steps:['Blend chickpeas, onion, garlic, flour, cumin, and coriander in a food processor until coarse.','Shape mixture into small patties.','Shallow-fry patties in hot oil until golden brown on both sides.','Warm pita bread, spread tahini sauce.','Add lettuce, tomato, and falafel patties.','Wrap tightly and serve.'], tip:'Chill the patties for 30 minutes before frying to help them hold together.', time:'25 min', diff:'Medium' },
+    { en:'Hummus', zh:'鹰嘴豆泥', ms:'Hummus', emoji:'🫘', cuisine:'Mediterranean', needs:['chickpea','garlic','lemon','olive oil'], ing:['1 can chickpeas, drained','3 tbsp tahini','2 garlic cloves','Juice of 1 lemon','2 tbsp olive oil','Salt, cumin','Paprika for garnish'], steps:['Blend chickpeas, tahini, garlic, lemon juice, and olive oil until smooth.','Add a splash of cold water if too thick.','Season with salt and cumin to taste.','Transfer to a plate, create a well with a spoon.','Drizzle with olive oil and sprinkle paprika.','Serve with pita bread or vegetable sticks.'], tip:'For extra-smooth hummus, peel the chickpeas before blending.', time:'10 min', diff:'Easy' },
+    { en:'Chicken Fajitas', zh:'墨西哥鸡肉卷', ms:'Fajitas Ayam', emoji:'🌮', cuisine:'Mexican', needs:['chicken','bell pepper','onion','tortilla','lime'], ing:['200g chicken breast, sliced','1 red bell pepper, sliced','1 onion, sliced','4 flour tortillas','Juice of 1 lime','1 tsp cumin','1 tsp paprika','Sour cream and salsa to serve'], steps:['Season chicken with cumin, paprika, salt, and pepper.','Sear chicken in a hot pan until cooked through; set aside.','In the same pan, stir-fry bell pepper and onion until slightly charred.','Return chicken to the pan, squeeze lime juice over everything.','Warm tortillas in a dry pan.','Fill tortillas with chicken mixture, top with sour cream and salsa.'], tip:'A hot, dry pan gives tortillas the best charred flavour.', time:'20 min', diff:'Easy' },
+    { en:'Lemon Herb Grilled Fish', zh:'柠檬香草烤鱼', ms:'Ikan Bakar Lemon Herba', emoji:'🐟', cuisine:'Mediterranean', needs:['fish','lemon','garlic','olive oil'], ing:['2 white fish fillets (sea bass or tilapia)','Juice and zest of 1 lemon','2 garlic cloves, minced','2 tbsp olive oil','1 tsp dried oregano','Salt and pepper','Fresh parsley'], steps:['Mix olive oil, lemon juice, lemon zest, garlic, and oregano.','Season fish fillets with salt and pepper, then coat with the lemon-herb mixture.','Marinate for 15 minutes.','Grill or pan-fry fish over medium heat for 3-4 minutes per side.','Fish should flake easily with a fork when done.','Garnish with fresh parsley and serve with roasted vegetables.'], tip:'Pat fish dry before marinating so the flavours adhere better.', time:'20 min', diff:'Easy' },
+    { en:'Chicken Quesadilla', zh:'墨西哥鸡肉饼', ms:'Quesadilla Ayam', emoji:'🧀', cuisine:'Mexican', needs:['chicken','cheese','tortilla','onion','bell pepper'], ing:['150g cooked chicken, shredded','2 large flour tortillas','1 cup shredded cheese (cheddar/mozzarella)','½ onion, sliced','½ bell pepper, sliced','Salsa and guacamole to serve'], steps:['Sauté onion and bell pepper until soft.','Place one tortilla in a dry pan over medium heat.','Sprinkle half the cheese, then chicken, vegetables, and remaining cheese.','Top with second tortilla, press down gently.','Cook until bottom is golden, then flip carefully and cook the other side.','Cut into wedges and serve with salsa and guacamole.'], tip:'Use medium heat so the cheese melts before the tortilla burns.', time:'15 min', diff:'Easy' },
+    { en:'Tomato Egg Drop Soup', zh:'番茄蛋花汤', ms:'Sup Telur Tomato', emoji:'🥣', cuisine:'Chinese', needs:['egg','tomato','garlic','oil'], ing:['2 eggs, lightly beaten','2 ripe tomatoes, diced','2 garlic cloves, minced','4 cups chicken or vegetable stock','1 tsp sesame oil','Salt and white pepper','Spring onion for garnish'], steps:['Sauté garlic in a little oil until fragrant.','Add diced tomatoes and cook until they start to break down.','Pour in stock, bring to a boil, then simmer for 10 minutes.','Slowly drizzle beaten eggs into the simmering soup while stirring gently.','Season with sesame oil, salt, and white pepper.','Garnish with spring onion and serve hot.'], tip:'Pour the eggs in a thin stream for beautiful silky ribbons.', time:'15 min', diff:'Easy' },
+    { en:'Pasta Aglio e Olio', zh:'蒜香辣椒意面', ms:'Pasta Aglio e Olio', emoji:'🍝', cuisine:'Italian', needs:['pasta','garlic','olive oil','chilli'], ing:['200g spaghetti','6 garlic cloves, thinly sliced','½ tsp red pepper flakes','¼ cup extra-virgin olive oil','Salt','Fresh parsley, chopped','Grated Parmesan (optional)'], steps:['Cook spaghetti in salted boiling water until al dente.','While pasta cooks, slowly heat olive oil in a pan with garlic and pepper flakes.','Cook garlic until just golden (do not burn).','Reserve 1 cup pasta water, then drain spaghetti.','Toss spaghetti in the garlic oil, adding pasta water as needed to create a light sauce.','Serve with parsley and Parmesan if desired.'], tip:'The starchy pasta water is the secret to a silky, emulsified sauce.', time:'15 min', diff:'Easy' },
+    { en:'Chicken Curry', zh:'咖喱鸡', ms:'Kari Ayam', emoji:'🍛', cuisine:'Southeast Asian', needs:['chicken','potato','coconut milk','onion','curry powder'], ing:['300g chicken pieces','2 potatoes, cubed','1 onion, diced','3 tbsp curry powder','1 cup coconut milk','1 cup water','2 tbsp oil','Salt to taste'], steps:['Heat oil in a pot, sauté onion until soft.','Add curry powder and stir for 1 minute until fragrant.','Add chicken pieces, stir to coat with spices.','Add potatoes, coconut milk, and water; bring to a boil.','Simmer for 25 minutes until chicken is tender and potatoes are cooked.','Season with salt and serve with rice or roti.'], tip:'Toast the curry powder in oil first to unlock its full flavour.', time:'35 min', diff:'Easy' },
+    { en:'Oyakodon', zh:'亲子丼', ms:'Oyakodon', emoji:'🍚', cuisine:'Japanese', needs:['egg','chicken','onion','soy sauce','rice'], ing:['2 eggs','150g chicken thigh, sliced','½ onion, sliced','3 tbsp soy sauce','2 tbsp mirin','1 tbsp sugar','½ cup dashi stock','Cooked rice'], steps:['Mix soy sauce, mirin, sugar, and dashi in a small bowl.','Pour sauce into a small pan, add onion and chicken.','Simmer until chicken is cooked and onion is tender.','Lightly beat eggs (do not overmix).','Pour eggs evenly over the chicken mixture, cover, and cook for 2 minutes.','Slide the entire omelette over a bowl of hot rice and serve.'], tip:'Slightly undercook the eggs — residual heat will finish them.', time:'15 min', diff:'Easy' },
+    { en:'Pancakes', zh:'美式松饼', ms:'Lempeng', emoji:'🥞', cuisine:'Western', needs:['egg','flour','milk','butter'], ing:['1 cup all-purpose flour','2 tbsp sugar','1 tsp baking powder','1 egg','¾ cup milk','2 tbsp melted butter','Maple syrup and fresh fruit to serve'], steps:['Whisk flour, sugar, and baking powder in a bowl.','In another bowl, whisk egg, milk, and melted butter.','Pour wet ingredients into dry ingredients; stir until just combined (lumps are okay).','Heat a non-stick pan over medium heat; lightly butter.','Pour ¼ cup batter per pancake; cook until bubbles form on surface, then flip.','Cook for 1-2 more minutes; serve with maple syrup and fruit.'], tip:'Do not overmix the batter — a few lumps make fluffier pancakes.', time:'15 min', diff:'Easy' },
+    { en:'Grilled Cheese Sandwich', zh:'烤芝士三明治', ms:'Sandwic Keju Bakar', emoji:'🥪', cuisine:'Western', needs:['bread','cheese','butter'], ing:['2 slices bread','2 slices cheddar cheese','1 tbsp butter'], steps:['Butter one side of each bread slice.','Place cheese between the unbuttered sides.','Heat a pan over medium heat.','Place sandwich in pan, buttered side down.','Cook until golden brown, then flip and cook the other side.','Cut diagonally and serve immediately.'], tip:'Low heat ensures the cheese melts completely before the bread burns.', time:'10 min', diff:'Easy' },
+  ];
+
+  const sauces = ['Garlic','Ginger','Chilli','Lemon','Herb','Black Pepper','Curry','Honey','Soy','Oyster'];
+  const recipes = [];
+  for (let i = 1; i <= 90; i++) {
+    const b = bases[(i-1) % bases.length];
+    const suffix = sauces[Math.floor((i-1) / bases.length) % sauces.length];
+    const shouldAddSuffix = !['Shakshuka','Falafel Wrap','Hummus','Pancakes','Grilled Cheese Sandwich','Miso Soup'].includes(b.en);
+    const newEn = shouldAddSuffix ? `${b.en} with ${suffix}` : b.en;
+    const newZh = shouldAddSuffix ? `${b.zh}（${suffix}风味）` : b.zh;
+    const newMs = shouldAddSuffix ? `${b.ms} (${suffix})` : b.ms;
+    
+    recipes.push({
+      id: 'r'+i,
+      en: newEn,
+      zh: newZh,
+      ms: newMs,
+      emoji: b.emoji,
+      cuisine: b.cuisine,
+      needs: b.needs,
+      ing: [...b.ing],
+      steps: [...b.steps],
+      time: b.time,
+      diff: b.diff,
+      bg: ['#FAEEDA','#E1F5EE','#FCEBEB','#EEEDFE'][i%4]
+    });
+  }
+  return recipes;
+})();
+
+
+// ----- Helper functions -----
+function go(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(viewId).classList.add('active');
+  currentView = viewId;
+  const nav = document.getElementById('bottom-nav');
+  nav.style.display = ['v-auth','v-recdet'].includes(viewId) ? 'none' : 'flex';
+  document.querySelectorAll('.nav-item').forEach(ni => ni.classList.toggle('active', ni.dataset.v === viewId));
+  if (viewId === 'v-home') renderHome();
+  else if (viewId === 'v-inv') { renderInvCatScroll(); renderInv(); }
+  else if (viewId === 'v-recipe') { renderCuisineFilter(); renderRecipes(); }
+  else if (viewId === 'v-mealplan') renderMealPlan();
+  else if (viewId === 'v-shop') renderShop();
+  else if (viewId === 'v-alerts') renderAlerts();
+  else if (viewId === 'v-profile') renderProfile();
+  else if (viewId === 'v-favorites') renderFavorites();
+}
+
+let toastQueue = [], toastShowing = false;
+function showToast(msg, ms=2200) {
+  toastQueue.push({msg, ms});
+  if (!toastShowing) processToastQueue();
+}
+function processToastQueue() {
+  if (toastQueue.length === 0) { toastShowing = false; return; }
+  toastShowing = true;
+  const {msg, ms} = toastQueue.shift();
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(t._t);
+  t._t = setTimeout(() => { t.style.display = 'none'; processToastQueue(); }, ms);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); if (id === 'm-barcode') stopBarcode(); }
+function showDialog(title, msg, okLabel, onOk) {
+  document.getElementById('dialog-title').textContent = title;
+  document.getElementById('dialog-msg').textContent = msg;
+  document.getElementById('dialog-ok-btn').textContent = okLabel;
+  window._dialogOkAction = () => { closeDialog(); onOk(); };
+  document.getElementById('m-confirm').classList.add('open');
+}
+function closeDialog() { document.getElementById('m-confirm').classList.remove('open'); }
+function dialogOkAction() { if (window._dialogOkAction) window._dialogOkAction(); }
+function toggleDark() { darkMode = !darkMode; document.documentElement.setAttribute('data-dark', darkMode); localStorage.setItem(CONFIG.LS_KEYS.DARK, darkMode); if (userProfile) SB.from('profiles').update({ dark_mode: darkMode }).eq('id', currentUser.id); }
+function applyDark() { document.documentElement.setAttribute('data-dark', darkMode); }
+
+function daysUntil(ds) {
+  const parts = ds.split('-');
+  const e = new Date(parts[0], parts[1]-1, parts[2]);
+  const n = new Date(); n.setHours(0,0,0,0);
+  return Math.round((e - n) / 86400000);
+}
+function greetText() { const h = new Date().getHours(); return h < 12 ? t('goodMorning') : h < 18 ? t('goodAfternoon') : t('goodEvening'); }
+function getCats() { return (userProfile && userProfile.categories) || ['Dairy','Vegetables','Meat & Fish','Fruits','Grains','Drinks','Frozen','Condiments','Snacks']; }
+function confetti() {
+  const container = document.getElementById('confetti-container');
+  const emojis = ['🎉','✨','🥬','🌟','🍃','💚'];
+  for(let i=0;i<30;i++){
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random()*100+'%';
+    piece.style.animationDuration = (Math.random()*2+1)+'s';
+    piece.style.fontSize = (Math.random()*20+10)+'px';
+    piece.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    container.appendChild(piece);
+    setTimeout(() => piece.remove(), 2000);
+  }
+}
+function updateAlertsPulse() {
+  const soon = fridgeItems.filter(i => !i.archived && daysUntil(i.expiry_date) >= 0 && daysUntil(i.expiry_date) <= 3);
+  const dot = document.getElementById('alerts-pulse');
+  if (dot) dot.style.display = soon.length ? 'block' : 'none';
+}
+
+function authTab(tab) {
+  document.getElementById('form-si').style.display = tab === 'si' ? 'block' : 'none';
+  document.getElementById('form-su').style.display = tab === 'su' ? 'block' : 'none';
+  document.getElementById('tab-si').classList.toggle('on', tab === 'si');
+  document.getElementById('tab-su').classList.toggle('on', tab === 'su');
+}
+async function doSignIn() {
+  const email = document.getElementById('si-email').value.trim();
+  const pass  = document.getElementById('si-pass').value;
+  const errEl = document.getElementById('si-err');
+  if (!email || !pass) { errEl.textContent = 'Please fill all fields'; return; }
+  const { error } = await SB.auth.signInWithPassword({ email, password: pass });
+  if (error) errEl.textContent = error.message;
+}
+async function doSignUp() {
+  const fn    = document.getElementById('su-fn').value.trim();
+  const ln    = document.getElementById('su-ln').value.trim();
+  const email = document.getElementById('su-email').value.trim();
+  const pass  = document.getElementById('su-pass').value;
+  const house = document.getElementById('su-house').value.trim() || (fn + "'s Kitchen");
+  const errEl = document.getElementById('su-err');
+  if (!fn || !email || !pass) { errEl.textContent = 'Please fill all required fields'; return; }
+  if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
+  const { error } = await SB.auth.signUp({ email, password: pass, options: { data: { display_name: fn+' '+ln, household: house } } });
+  if (error) errEl.textContent = error.message;
+  else { showToast('Account created! You can sign in now.'); authTab('si'); }
+}
+function doGoogleSignIn() { SB.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } }); }
+async function doLogout() {
+  await SB.auth.signOut();
+  currentUser = null; userProfile = null; fridgeItems = []; shopItems = [];
+  localStorage.removeItem(CONFIG.LS_KEYS.FAVORITES);
+  favoriteIds = [];
+  go('v-auth');
+}
+
+async function loadSession() {
+  const { data: { session } } = await SB.auth.getSession();
+  if (session) await handleUser(session.user);
+  SB.auth.onAuthStateChange(async (event, session) => {
+    if (session) await handleUser(session.user);
+    else go('v-auth');
+  });
+}
+async function handleUser(user) {
+  currentUser = user;
+  await loadProfile(user);
+  await loadItems();
+  await loadShop();
+  go('v-home');
+}
+async function loadProfile(user) {
+  const { data } = await SB.from('profiles').select('*').eq('id', user.id).single();
+  if (data) {
+    userProfile = data;
+    if (data.language) { LANG = data.language; applyLang(); }
+    if (typeof data.dark_mode === 'boolean') { darkMode = data.dark_mode; applyDark(); }
+  } else {
+    const meta = user.user_metadata || {};
+    await SB.from('profiles').insert({ id: user.id, email: user.email, household: meta.household || 'My Kitchen', categories: getCats(), language: LANG, dark_mode: darkMode, avg_item_price: 10 });
+    userProfile = { household: meta.household || 'My Kitchen', categories: getCats(), avg_item_price: 10 };
+  }
+}
+async function loadItems() {
+  const { data } = await SB.from('items').select('*').eq('user_id', currentUser.id).order('created_at');
+  fridgeItems = data || [];
+}
+async function loadShop() {
+  const { data } = await SB.from('shopping_list').select('*').eq('user_id', currentUser.id);
+  shopItems = data || [];
+}
+
+async function safeCall(asyncFn, fallbackMsg='Something went wrong') {
+  try { return await asyncFn(); }
+  catch(e) { showToast(fallbackMsg); console.error(e); return null; }
+}
+
+// ----- renderHome with try-finally skeleton protection -----
+function renderHome() {
+  const skel = document.getElementById('home-skeleton');
+  if (skel) skel.style.display = 'block';
+  try {
+    if (!userProfile) return;
+    document.getElementById('h-greet').textContent = greetText();
+    document.getElementById('h-house').textContent = userProfile.household || 'My Kitchen';
+    document.getElementById('h-date').textContent = new Date().toLocaleDateString(LANG==='zh'?'zh-CN':LANG==='ms'?'ms-MY':'en-MY', {weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+    const items = fridgeItems.filter(i => !i.archived);
+    let expired = 0, expSoon = 0, wastedTotal = 0;
+    items.forEach(i => { const d = daysUntil(i.expiry_date); if (d < 0) { expired++; wastedTotal += estimateItemPrice(i.name, i.quantity, i.unit); } else if (d <= 7) expSoon++; });
+    const total = items.length;
+    document.getElementById('h-tot').textContent = total;
+    document.getElementById('h-exp').textContent = expSoon;
+    document.getElementById('h-urg').textContent = expired;
+    const freshness = total ? Math.round((total - expired) / total * 100) : 100;
+    document.getElementById('h-fresh-pct').textContent = freshness + '%';
+    document.getElementById('h-fresh-fill').style.width = freshness + '%';
+    const ring = document.getElementById('ring-fg');
+    const circumference = 2 * Math.PI * 34;
+    ring.style.strokeDasharray = circumference;
+    ring.style.strokeDashoffset = circumference - (freshness / 100) * circumference;
+    document.getElementById('ring-text').textContent = freshness + '%';
+    document.getElementById('h-saved').textContent = `RM ${wastedTotal.toFixed(2)}`;
+
+    const recent = [...items].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0,5);
+    const recentSec = document.getElementById('h-recent-section');
+    if (recent.length) {
+      recentSec.style.display = 'block';
+      document.getElementById('h-recent-list').innerHTML = recent.map(it => `<div class="exp-chip" onclick="go('v-inv')">${it.emoji} ${it.name}</div>`).join('');
+    } else recentSec.style.display = 'none';
+
+    const catCounts = {};
+    items.forEach(it => { catCounts[it.category] = (catCounts[it.category] || 0) + 1; });
+    document.getElementById('h-cat-snapshot').innerHTML = Object.entries(catCounts).map(([cat,cnt]) => `<div class="chip">${cat} ${cnt}</div>`).join('');
+
+    const daysOfWeek = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay() + 1);
+    const weeklyCounts = daysOfWeek.map((_,i) => {
+      const d = new Date(startOfWeek);
+      d.setDate(d.getDate()+i);
+      return fridgeItems.filter(it => {
+        const exp = new Date(it.expiry_date+'T00:00:00');
+        return exp.toDateString() === d.toDateString() && !it.archived;
+      }).length;
+    });
+    const maxCount = Math.max(...weeklyCounts, 1);
+    const chartHtml = daysOfWeek.map((day,i) => {
+      const height = (weeklyCounts[i]/maxCount)*50;
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1"><div style="font-size:10px;margin-bottom:2px">${weeklyCounts[i]}</div><div style="width:100%;background:var(--green);border-radius:2px;height:${height}px;min-height:4px"></div><div style="font-size:9px;margin-top:2px;color:var(--text3)">${day}</div></div>`;
+    }).join('');
+    document.getElementById('h-weekly-chart').innerHTML = chartHtml;
+
+    const availableRecipes = RECIPES.filter(r => matchRecipe(r, items));
+    if (availableRecipes.length) {
+      const rotd = availableRecipes[Math.floor(Math.random()*availableRecipes.length)];
+      document.getElementById('h-recipe-of-day').style.display = 'block';
+      document.getElementById('h-recipe-card').innerHTML = `<div onclick="openRecipe('${rotd.id}')" style="cursor:pointer;display:flex;align-items:center;gap:12px"><div style="font-size:40px">${rotd.emoji}</div><div><div style="font-weight:700">${rotd[LANG] || rotd.en}</div><div style="font-size:12px;color:var(--text3)">${rotd.time} · ${rotd.diff}</div></div></div>`;
+      document.getElementById('h-recipe-card').onclick = () => openRecipe(rotd.id);
+    } else document.getElementById('h-recipe-of-day').style.display = 'none';
+
+    if (items.length === 0) document.getElementById('h-tip-card').style.display = 'block';
+    else document.getElementById('h-tip-card').style.display = 'none';
+
+    const expItems = items.filter(i => daysUntil(i.expiry_date) >= 0 && daysUntil(i.expiry_date) <= 5).sort((a,b) => daysUntil(a.expiry_date)-daysUntil(b.expiry_date));
+    const expSec = document.getElementById('h-exp-section');
+    if (expItems.length) {
+      expSec.style.display = 'block';
+      document.getElementById('h-exp-list').innerHTML = expItems.slice(0,8).map(it => {
+        const d = daysUntil(it.expiry_date);
+        const col = d <= 1 ? 'var(--red)' : d <= 4 ? 'var(--amber)' : 'var(--green)';
+        return `<div class="exp-chip" onclick="go('v-inv')" style="border-top:3px solid ${col}"><div style="font-size:24px">${it.emoji}</div><div style="font-size:13px;font-weight:700">${it.name}</div><div style="font-size:11px;color:${col}">${d===0?'Today':d===1?'Tomorrow':d+'d'}</div></div>`;
+      }).join('');
+    } else expSec.style.display = 'none';
+
+    const hAv = document.getElementById('h-avatar');
+    if (userProfile.photo_url) {
+      if (userProfile.photo_url.startsWith('emoji:')) { hAv.innerHTML = userProfile.photo_url.replace('emoji:',''); hAv.style.fontSize = '18px'; }
+      else { hAv.innerHTML = `<img src="${userProfile.photo_url}" style="width:30px;height:30px;border-radius:50%;object-fit:cover">`; hAv.style.fontSize = ''; }
+    } else { hAv.textContent = (userProfile.display_name || currentUser.email || '?')[0].toUpperCase(); hAv.style.fontSize = '14px'; }
+    updateAlertsPulse();
+    if (!localStorage.getItem(CONFIG.LS_KEYS.ONBOARDED)) setTimeout(startOnboarding, 800);
+  } finally {
+    if (skel) skel.style.display = 'none';
+  }
+}
+
+let invCatFilter = 'All';
+function renderInvCatScroll() {
+  const cats = getCats();
+  document.getElementById('inv-cat-scroll').innerHTML = 
+    `<div class="chip ${invCatFilter==='All'?'on':''}" onclick="invCatFilter='All';renderInvCatScroll();renderInv()">All</div>` +
+    cats.map(c => `<div class="chip ${invCatFilter===c?'on':''}" onclick="invCatFilter='${c}';renderInvCatScroll();renderInv()">${c}</div>`).join('');
+}
+let invSearchTimer;
+function debounceInv() { clearTimeout(invSearchTimer); invSearchTimer = setTimeout(() => renderInv(), 300); }
+function renderInv() {
+  const q = (document.getElementById('inv-search')?.value || '').toLowerCase();
+  let items = fridgeItems.filter(i => !i.archived);
+  if (invCatFilter !== 'All') items = items.filter(i => i.category === invCatFilter);
+  if (q) items = items.filter(i => i.name.toLowerCase().includes(q));
+  items.sort((a,b) => daysUntil(a.expiry_date) - daysUntil(b.expiry_date));
+  const empty = document.getElementById('inv-empty'), list = document.getElementById('inv-list');
+  if (!items.length) { empty.style.display = 'flex'; list.innerHTML = ''; return; }
+  empty.style.display = 'none';
+  const grouped = {};
+  items.forEach(i => { const cat = i.category || 'Other'; if (!grouped[cat]) grouped[cat] = []; grouped[cat].push(i); });
+  let html = '';
+  Object.entries(grouped).forEach(([cat, its]) => {
+    html += `<div class="cat-section-title">${cat}</div>`;
+    html += its.map(it => {
+      const d = daysUntil(it.expiry_date);
+      const bg = d<0?{cls:'badge-red',t:'Expired'}:d===0?{cls:'badge-red',t:'Today!'}:d===1?{cls:'badge-red',t:'Tomorrow'}:d<=4?{cls:'badge-amber',t:d+' days'}:{cls:'badge-green',t:d+' days'};
+      return `<div class="item-row" onclick="openEditItem('${it.id}')"><div class="item-emoji">${it.emoji}</div><div class="item-info"><div class="item-name">${it.name}</div><div class="item-meta">${it.quantity} ${it.unit}</div></div><div class="item-right"><span class="badge ${bg.cls}">${bg.t}</span></div></div>`;
+    }).join('');
+  });
+  list.innerHTML = html;
+}
+
+function openAddItem(prefill={}) {
+  window._isEditingItem = false;
+  editItemId = null; addQtyVal = 1; selectedEmoji = '🥛'; selectedCat = getCats()[0] || 'Dairy';
+  document.getElementById('item-sheet-title').textContent = t('addIngredient');
+  document.getElementById('it-name').value = prefill.name || '';
+  document.getElementById('qty-v').textContent = '1';
+  document.getElementById('it-unit').value = 'pieces';
+  document.getElementById('it-note').value = prefill.note || '';
+  document.getElementById('it-del-btn').style.display = 'none';
+  document.getElementById('it-archive-btn').style.display = 'none';
+  document.getElementById('it-save-btn').innerHTML = '<span>'+t('saveToFridge')+'</span>';
+  const d = new Date(); d.setDate(d.getDate()+7);
+  document.getElementById('it-exp').value = d.toISOString().split('T')[0];
+  document.getElementById('it-exp').setAttribute('min', new Date().toISOString().split('T')[0]);
+  buildEmojiGrid(); buildItemCatChips();
+  openModal('m-item');
+}
+function openEditItem(id) {
+  window._isEditingItem = true;
+  const it = fridgeItems.find(i => i.id === id); if (!it) return;
+  editItemId = id; addQtyVal = it.quantity; selectedEmoji = it.emoji; selectedCat = it.category;
+  document.getElementById('item-sheet-title').textContent = t('editItem');
+  document.getElementById('it-name').value = it.name;
+  document.getElementById('qty-v').textContent = it.quantity;
+  document.getElementById('it-unit').value = it.unit;
+  document.getElementById('it-note').value = it.notes || '';
+  document.getElementById('it-exp').value = it.expiry_date;
+  document.getElementById('it-exp').setAttribute('min', new Date().toISOString().split('T')[0]);
+  document.getElementById('it-del-btn').style.display = 'block';
+  document.getElementById('it-archive-btn').style.display = 'block';
+  document.getElementById('it-save-btn').innerHTML = '<span>'+t('updateItem')+'</span>';
+  buildEmojiGrid(); buildItemCatChips();
+  openModal('m-item');
+}
+function cancelItem() {
+  const name = document.getElementById('it-name').value.trim();
+  const exp = document.getElementById('it-exp').value;
+  if (name || exp) {
+    showDialog('Discard changes?', 'You have unsaved changes. Do you want to discard them?', 'Discard', () => {
+      window._isEditingItem = false;
+      closeModal('m-item');
+    });
+  } else {
+    closeModal('m-item');
+  }
+}
+function buildEmojiGrid() {
+  const grid = document.getElementById('emoji-grid');
+  const emojis = ['🥛','🧀','🥚','🍗','🥩','🐟','🥕','🥦','🍅','🧅','🧄','🥔','🍚','🍞','🧈','🍎','🍌','🍊','🍋','🍇','🍓','🥒','🥬','🍄','🫑','🌽','🥑'];
+  grid.innerHTML = emojis.map(e => `<button class="emoji-btn ${e===selectedEmoji?'on':''}" onclick="pickEmoji('${e}')">${e}</button>`).join('');
+}
+function pickEmoji(e) { selectedEmoji = e; buildEmojiGrid(); }
+function buildItemCatChips() {
+  document.getElementById('it-cats').innerHTML = getCats().map(c => `<div class="chip ${c===selectedCat?'on':''}" onclick="pickItemCat('${c}')">${c}</div>`).join('');
+}
+function pickItemCat(c) { selectedCat = c; buildItemCatChips(); }
+function addCatFromItem() {
+  const c = document.getElementById('it-newcat').value.trim(); if (!c) return;
+  const cats = getCats(); if (!cats.includes(c)) { userProfile.categories = [...cats, c]; SB.from('profiles').update({ categories: userProfile.categories }).eq('id', currentUser.id); }
+  document.getElementById('it-newcat').value = ''; selectedCat = c; buildItemCatChips();
+}
+function adjQty(d) { addQtyVal = Math.max(1, addQtyVal+d); document.getElementById('qty-v').textContent = addQtyVal; }
+async function saveItem() {
+  const btn = document.getElementById('it-save-btn');
+const savedBtnHTML = btn.innerHTML;
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Saving…';
+  try {
+    const name = document.getElementById('it-name').value.trim();
+    const exp = document.getElementById('it-exp').value;
+    if (!name || !exp) { showToast('Name and expiry required'); return; }
+    const today = new Date().toISOString().split('T')[0];
+    if (exp < today) { showToast('Expiry date cannot be in the past'); return; }
+    const payload = { name, emoji: selectedEmoji, category: selectedCat, quantity: addQtyVal, unit: document.getElementById('it-unit').value, expiry_date: exp, notes: document.getElementById('it-note').value.trim(), user_id: currentUser.id, archived: false };
+    if (editItemId) { await safeCall(() => SB.from('items').update(payload).eq('id', editItemId), 'Could not update item'); showToast('Updated'); }
+    else { await safeCall(() => SB.from('items').insert(payload), 'Could not add item'); showToast('Added'); }
+    await loadItems(); closeModal('m-item'); renderInv(); renderHome();
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = savedBtnHTML;
+  }
+}
+function confirmDeleteItem() { showDialog('Delete Item', t('areYouSure'), 'Delete', () => deleteItem()); }
+async function deleteItem() {
+  const it = fridgeItems.find(i => i.id === editItemId);
+  if (!it) return;
+  const deleted = { ...it };
+  await safeCall(() => SB.from('items').delete().eq('id', editItemId), 'Could not delete item');
+  showUndo(`"${it.name}" removed.`, async () => {
+    await safeCall(() => SB.from('items').insert({ ...deleted, id: editItemId }), 'Could not restore item');
+    await loadItems(); renderInv(); renderHome(); showToast('Item restored.');
+  });
+  await loadItems(); closeModal('m-item'); renderInv(); renderHome();
+}
+async function archiveItem() { await SB.from('items').update({ archived: true }).eq('id', editItemId); showToast('Archived'); await loadItems(); closeModal('m-item'); renderInv(); }
+
+// Barcode
+function openBarcodeScanner() { openModal('m-barcode'); startCamera(); }
+function startCamera() {
+  const video = document.getElementById('bc-video');
+  video.style.display = 'none';
+  document.getElementById('bc-status').textContent = 'Starting camera...';
+  if (!navigator.mediaDevices) { document.getElementById('bc-status').textContent = 'Camera not supported — type manually'; return; }
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(stream => { bcStream = stream; video.style.display = 'block'; video.srcObject = stream; document.getElementById('bc-status').textContent = 'Point camera at barcode';
+      if ('BarcodeDetector' in window) { bcDetector = new BarcodeDetector({ formats: ['ean_13','ean_8','qr_code','code_128','code_39'] }); scanLoop(video); }
+      else document.getElementById('bc-status').textContent = 'BarcodeDetector not supported — type manually';
+    })
+    .catch(() => document.getElementById('bc-status').textContent = 'Camera access denied — type manually');
+}
+async function scanLoop(video) { if (!bcDetector || !bcStream) return; try { const barcodes = await bcDetector.detect(video); if (barcodes.length) { stopBarcode(); await lookupBarcode(barcodes[0].rawValue); return; } } catch(e) {} if (bcStream) requestAnimationFrame(() => scanLoop(video)); }
+function stopBarcode() { if (bcStream) { bcStream.getTracks().forEach(t => t.stop()); bcStream = null; } bcDetector = null; }
+function closeBarcodeScanner() { stopBarcode(); closeModal('m-barcode'); }
+async function lookupBarcode(code) { if (!code) return; showToast('Looking up barcode…'); try { const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`); const data = await res.json(); if (data.status === 1 && data.product) { closeBarcodeScanner(); openAddItem({ name: data.product.product_name || 'Scanned item' }); } else { closeBarcodeScanner(); showToast('Product not found — enter name manually'); openAddItem({ note: `Barcode: ${code}` }); } } catch(e) { closeBarcodeScanner(); showToast('Network error — enter manually'); openAddItem({ note: `Barcode: ${code}` }); } }
+
+// RECIPES WITH MISSING INGREDIENTS
+function matchRecipe(r, items) {
+  if (!items.length) return false;
+  const names = items.map(i => i.name.toLowerCase());
+  const matched = r.needs.filter(n => names.some(nm => nm.includes(n) || n.includes(nm.split(' ')[0])));
+  return matched.length >= Math.min(2, r.needs.length);
+}
+function matchRecipeFast(r, nameSet) {
+  if (nameSet.size === 0) return false;
+  const matched = r.needs.filter(n => [...nameSet].some(nm => nm.includes(n) || n.includes(nm)));
+  return matched.length >= Math.min(2, r.needs.length);
+}
+function getMissingIngredients(r, items) {
+  const names = new Set(items.map(i => i.name.toLowerCase()));
+  return r.ing.filter(ing => {
+    const simple = ing.replace(/[0-9]/g,'').replace(/cup|tbsp|tsp|g|kg|ml|pieces|pack|bottle|can|box|bag/gi,'').trim().toLowerCase();
+    return ![...names].some(nm => nm.includes(simple) || simple.includes(nm));
+  });
+}
+function renderCuisineFilter() {
+  const cuisines = ['All', ...new Set(RECIPES.map(r => r.cuisine))];
+  document.getElementById('cuisine-filter').innerHTML = cuisines.map(c => 
+    `<div class="chip ${recipeCuisineFilter===c?'on':''}" onclick="recipeCuisineFilter='${c}';renderCuisineFilter();renderRecipes()">${c}</div>`
+  ).join('');
+}
+function renderRecipes() {
+  const items = fridgeItems.filter(i => !i.archived);
+  const itemNamesLower = new Set(items.map(i => i.name.toLowerCase()));
+let matched = RECIPES.filter(r => matchRecipeFast(r, itemNamesLower));
+  if (recipeCuisineFilter !== 'All') matched = matched.filter(r => r.cuisine === recipeCuisineFilter);
+  document.getElementById('rec-count-lbl').textContent = matched.length + ' ' + t('recipesReady');
+  const empty = document.getElementById('rec-empty'), list = document.getElementById('rec-list');
+  if (!matched.length) { empty.style.display = 'flex'; list.innerHTML = ''; return; }
+  empty.style.display = 'none';
+  list.innerHTML = matched.map(r => {
+    const name = r[LANG] || r.en;
+    const isFav = favoriteIds.includes(r.id);
+    return `<div class="recipe-card" onclick="openRecipe('${r.id}')">
+      <div class="recipe-thumb" style="background:${r.bg}">
+        ${r.emoji}
+        <button class="icon-btn" style="position:absolute; top:6px; right:6px; width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.9);" onclick="event.stopPropagation(); toggleFavorite('${r.id}')">
+          <i class="ti ti-heart${isFav?'-filled':''}" style="color:var(--red); font-size:14px;"></i>
+        </button>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-title">${name}</div>
+        <div class="recipe-tags">
+          <span class="badge badge-blue">⏱ ${r.time}</span>
+          <span class="badge badge-green">${r.diff}</span>
+          <span class="badge badge-purple">${r.cuisine}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openRecipe(id) {
+  const r = RECIPES.find(x => x.id === id); if (!r) return;
+  currentRecipeId = id;
+  const name = r[LANG] || r.en;
+  const items = fridgeItems.filter(i => !i.archived);
+  const haveNames = new Set(items.map(i => i.name.toLowerCase()));
+  const missing = getMissingIngredients(r, items);
+  const isFav = favoriteIds.includes(id);
+  
+  document.getElementById('rd-title').textContent = name;
+  document.getElementById('rd-fav-icon').className = isFav ? 'ti ti-heart-filled' : 'ti ti-heart';
+  document.getElementById('rd-fav-btn').style.color = isFav ? 'var(--red)' : 'var(--text2)';
+  
+  document.getElementById('rd-body').innerHTML = `
+    <div style="height:160px;background:${r.bg};border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:72px">${r.emoji}</div>
+    <div class="card"><h3>${t('Ingredients')}</h3>
+      ${r.ing.map(ing => {
+        const simple = ing.replace(/[0-9]/g,'').replace(/cup|tbsp|tsp|g|kg|ml|pieces|pack|bottle|can|box|bag/gi,'').trim().toLowerCase();
+        const inFridge = [...haveNames].some(nm => nm.includes(simple) || simple.includes(nm));
+        return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span>${inFridge ? '✅' : '❌'}</span>
+          <span style="flex:1">${ing}</span>
+          ${!inFridge ? `<button class="btn btn-sm" onclick="addMissingToShop('${ing.replace(/'/g,"\\'")}')">+ Shop</button>` : ''}
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="card"><h3>${t('Step By Step')}</h3>${r.steps.map((s,i)=>`<div style="display:flex;gap:10px;margin-bottom:12px"><div style="width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700">${i+1}</div><div>${s}</div></div>`).join('')}</div>
+    ${missing.length ? `<button class="btn btn-sec" style="margin-top:12px" onclick="addAllMissingToShop('${r.id}')">🛒 Add All Missing to Shop (${missing.length})</button>` : ''}
+  `;
+  go('v-recdet');
+}
+function toggleFavorite(recipeId) {
+  if (!recipeId) return;
+  const idx = favoriteIds.indexOf(recipeId);
+  if (idx > -1) {
+    favoriteIds.splice(idx, 1);
+  } else {
+    favoriteIds.push(recipeId);
+  }
+  localStorage.setItem(CONFIG.LS_KEYS.FAVORITES, JSON.stringify(favoriteIds));
+  const isFav = favoriteIds.includes(recipeId);
+  document.getElementById('rd-fav-icon').className = isFav ? 'ti ti-heart-filled' : 'ti ti-heart';
+  document.getElementById('rd-fav-btn').style.color = isFav ? 'var(--red)' : 'var(--text2)';
+  if (currentView === 'v-recipe') renderRecipes();
+  if (currentView === 'v-favorites') renderFavorites();
+  showToast(isFav ? 'Added to favorites' : 'Removed from favorites');
+}
+function renderFavorites() {
+  const favRecipes = RECIPES.filter(r => favoriteIds.includes(r.id));
+  const empty = document.getElementById('fav-empty'), list = document.getElementById('fav-list');
+  if (!favRecipes.length) {
+    empty.style.display = 'flex';
+    list.innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = favRecipes.map(r => {
+    const name = r[LANG] || r.en;
+    return `<div class="recipe-card" onclick="openRecipe('${r.id}')">
+      <div class="recipe-thumb" style="background:${r.bg}">
+        ${r.emoji}
+        <button class="icon-btn" style="position:absolute; top:6px; right:6px; width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.9);" onclick="event.stopPropagation(); toggleFavorite('${r.id}')">
+          <i class="ti ti-heart-filled" style="color:var(--red); font-size:14px;"></i>
+        </button>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-title">${name}</div>
+        <div class="recipe-tags">
+          <span class="badge badge-blue">⏱ ${r.time}</span>
+          <span class="badge badge-green">${r.diff}</span>
+          <span class="badge badge-purple">${r.cuisine}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function addMissingToShop(ing) {
+  await SB.from('shopping_list').insert({ name: ing, category:'Groceries', done:false, auto_suggest:false, user_id:currentUser.id });
+  await loadShop();
+  showToast(`Added "${ing}" to shopping list`);
+}
+async function addAllMissingToShop(recipeId) {
+  const r = RECIPES.find(x => x.id === recipeId);
+  if (!r) return;
+  const missing = getMissingIngredients(r, fridgeItems.filter(i => !i.archived));
+  if (!missing.length) return;
+  await Promise.all(missing.map(ing => SB.from('shopping_list').insert({ name: ing, category:'Groceries', done:false, auto_suggest:false, user_id:currentUser.id })));
+  await loadShop();
+  showToast(`${missing.length} items added to shopping list!`);
+}
+
+// Meal plan
+function renderMealPlan() {
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const meals = ['breakfast','lunch','dinner'];
+  const emojiMap = { breakfast:'🌅', lunch:'☀️', dinner:'🌙' };
+  document.getElementById('meal-plan-grid').innerHTML = days.map(day => `
+    <div class="card" style="margin-bottom:12px">
+      <h3 style="margin-bottom:12px">${day}</h3>
+      ${meals.map(meal => {
+        const rid = mealPlan[day]?.[meal];
+        const recipe = rid ? RECIPES.find(r => r.id === rid) : null;
+        const name = recipe ? (recipe[LANG]||recipe.en) : '—';
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:18px">${emojiMap[meal]}</span>
+            <div><small>${meal}</small><br><b>${recipe ? recipe.emoji : ''} ${name}</b></div>
+          </div>
+          <button class="btn btn-sm" onclick="pickMeal('${day}','${meal}')">Replace</button>
+        </div>`;
+      }).join('')}
+      <button class="btn btn-sm" style="margin-top:8px" onclick="addMealsToShop('${day}')">🛒 Add to Shop</button>
+    </div>
+  `).join('');
+}
+function pickMeal(day, mealType) {
+  const available = RECIPES.filter(r => matchRecipe(r, fridgeItems));
+  if (!available.length) return showToast('Add more items first');
+  const recipe = available[Math.floor(Math.random() * available.length)];
+  if (!mealPlan[day]) mealPlan[day] = {};
+  mealPlan[day][mealType] = recipe.id;
+  localStorage.setItem('ff-mealplan', JSON.stringify(mealPlan));
+  renderMealPlan();
+}
+async function addMealsToShop(day) {
+  const planned = mealPlan[day] || {};
+  const allIngredients = [];
+  for (const rid of Object.values(planned)) {
+    const recipe = RECIPES.find(r => r.id === rid);
+    if (recipe) allIngredients.push(...recipe.ing);
+  }
+  if (!allIngredients.length) return;
+  const existingNames = new Set(shopItems.map(s => s.name.toLowerCase()));
+  const toAdd = allIngredients.filter(ing => !existingNames.has(ing.toLowerCase()));
+  if (!toAdd.length) return showToast('All ingredients already in shopping list');
+  await Promise.all(toAdd.map(ing => SB.from('shopping_list').insert({ name: ing, category:'Groceries', done:false, auto_suggest:true, user_id:currentUser.id })));
+  await loadShop();
+  renderShop();
+  showToast(`${toAdd.length} items added from ${day}'s meal plan`);
+}
+function clearMealPlan() {
+  mealPlan = {};
+  localStorage.removeItem('ff-mealplan');
+  renderMealPlan();
+  showToast('Meal plan cleared!');
+}
+
+// Shopping
+async function quickAddShop(name) { await SB.from('shopping_list').insert({ name, category:'Groceries', done:false, auto_suggest:false, user_id:currentUser.id }); await loadShop(); renderShop(); showToast(`Added ${name}`); }
+async function addShopManual() {
+  const name = document.getElementById('shop-inp').value.trim();
+  if (!name) return;
+  await SB.from('shopping_list').insert({ name, category: document.getElementById('shop-cat-sel').value, done:false, auto_suggest:false, user_id:currentUser.id });
+  const inp = document.getElementById('shop-inp');
+  inp.value = '';
+  await loadShop();
+  renderShop();
+  showToast('Added');
+  inp.focus();
+}
+function renderShop() {
+  document.getElementById('shop-cat-sel').innerHTML = ['Groceries', ...getCats()].map(c => `<option>${c}</option>`).join('');
+  const remaining = shopItems.filter(s => !s.done);
+  document.getElementById('shop-cnt').textContent = remaining.length;
+  let total = 0; remaining.forEach(s => total += estimateItemPrice(s.name, 1, 'piece'));
+  document.getElementById('shop-estimate').textContent = `Total: RM ${total.toFixed(2)}`;
+  if (!shopItems.length) { document.getElementById('shop-empty').style.display = 'flex'; document.getElementById('shop-list').innerHTML = ''; return; }
+  document.getElementById('shop-empty').style.display = 'none';
+  const byCat = {};
+  shopItems.forEach(s => { if (!byCat[s.category]) byCat[s.category] = []; byCat[s.category].push(s); });
+  document.getElementById('shop-list').innerHTML = Object.entries(byCat).map(([cat, its]) => `<div class="card" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><b>${cat}</b><small>${its.filter(i=>!i.done).length} left</small></div>${its.map(s => `<div class="shop-row ${s.done?'done':''}" data-id="${s.id}" onclick="toggleShop('${s.id}',${s.done})"><div class="shop-check ${s.done?'done-c':''}">${s.done?'<i class="ti ti-check" style="font-size:13px;color:#fff"></i>':''}</div><div style="flex:1" class="shop-name">${s.name}</div><button onclick="event.stopPropagation();removeShopItem('${s.id}')" style="background:none;border:none;cursor:pointer;color:var(--text4)">✕</button></div>`).join('')}</div>`).join('');
+}
+async function toggleShop(id, done) { await SB.from('shopping_list').update({ done: !done }).eq('id', id); await loadShop(); renderShop(); }
+async function removeShopItem(id) { await SB.from('shopping_list').delete().eq('id', id); await loadShop(); renderShop(); }
+async function clearDoneShop() {
+  const done = shopItems.filter(s => s.done);
+  if (!done.length) { showToast('No checked items to clear'); return; }
+  showDialog('Clear completed items?', 'This will permanently remove all checked items.', 'Clear', async () => {
+    await Promise.all(done.map(s => SB.from('shopping_list').delete().eq('id', s.id)));
+    await loadShop();
+    renderShop();
+    confetti();
+  });
+}
+
+// Alerts
+function renderAlerts() {
+  const soon = fridgeItems.filter(i => !i.archived && daysUntil(i.expiry_date) >= 0 && daysUntil(i.expiry_date) <= 3).sort((a,b) => daysUntil(a.expiry_date)-daysUntil(b.expiry_date));
+  if (!soon.length) { document.getElementById('alerts-empty').style.display = 'flex'; document.getElementById('alerts-list').innerHTML = ''; return; }
+  document.getElementById('alerts-empty').style.display = 'none';
+  document.getElementById('alerts-list').innerHTML = soon.map(i => `<div class="item-row" onclick="go('v-inv')"><div class="item-emoji">${i.emoji}</div><div><b>${i.name}</b><br><small>${daysUntil(i.expiry_date)===0?'Today':daysUntil(i.expiry_date)+' days'}</small></div><span class="badge badge-red">!</span></div>`).join('');
+}
+
+// Profile
+function renderProfile() {
+  if (!userProfile) return;
+  const av = document.getElementById('prof-av');
+  if (userProfile.photo_url) {
+    if (userProfile.photo_url.startsWith('emoji:')) av.innerHTML = `<span style="font-size:40px">${userProfile.photo_url.replace('emoji:','')}</span>`;
+    else av.innerHTML = `<img src="${userProfile.photo_url}" alt="photo">`;
+  } else av.textContent = (userProfile.display_name || currentUser.email || '?')[0].toUpperCase();
+  document.getElementById('prof-name').textContent = userProfile.display_name || '';
+  document.getElementById('prof-email').textContent = currentUser.email || '';
+  document.getElementById('prof-badge').textContent = userProfile.household || '';
+  document.getElementById('p-house').value = userProfile.household || '';
+  document.getElementById('p-name').value = userProfile.display_name || '';
+  document.getElementById('p-avg-price').value = userProfile.avg_item_price || 10;
+  document.getElementById('prof-ic').textContent = fridgeItems.filter(i=>!i.archived).length;
+  document.getElementById('prof-sc').textContent = shopItems.filter(i=>!i.done).length;
+  document.getElementById('prof-cats').innerHTML = getCats().map(c => `<div class="chip">${c}<span onclick="removeCategory('${c}')" style="margin-left:5px;cursor:pointer">×</span></div>`).join('');
+  document.getElementById('dark-toggle').classList.toggle('on', darkMode);
+  document.querySelectorAll('.theme-color-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.theme === currentTheme);
+  });
+  applyLang();
+}
+async function saveProfile() {
+  const household = document.getElementById('p-house').value.trim();
+  const displayName = document.getElementById('p-name').value.trim();
+  const avgPrice = parseFloat(document.getElementById('p-avg-price').value) || 10;
+  if (!household) { showToast('Kitchen name is required'); return; }
+  const updates = { household, display_name: displayName, avg_item_price: avgPrice };
+  const { error } = await SB.from('profiles').update(updates).eq('id', currentUser.id);
+  if (error) { showToast('Failed to save profile'); console.error(error); }
+  else { userProfile = { ...userProfile, ...updates }; renderProfile(); showToast('Profile saved'); }
+}
+async function addCategory() {
+  const newCat = document.getElementById('new-cat-inp').value.trim();
+  if (!newCat) return;
+  const cats = getCats();
+  if (cats.includes(newCat)) { showToast('Category already exists'); return; }
+  const updatedCats = [...cats, newCat];
+  const { error } = await SB.from('profiles').update({ categories: updatedCats }).eq('id', currentUser.id);
+  if (error) { showToast('Failed to add category'); return; }
+  userProfile.categories = updatedCats;
+  document.getElementById('new-cat-inp').value = '';
+  renderProfile();
+  showToast('Category added');
+}
+async function removeCategory(cat) {
+  const cats = getCats().filter(c => c !== cat);
+  const { error } = await SB.from('profiles').update({ categories: cats }).eq('id', currentUser.id);
+  if (error) { showToast('Failed to remove category'); return; }
+  userProfile.categories = cats;
+  renderProfile();
+  showToast('Category removed');
+}
+function exportCSV(event) {
+  const btn = event.target;
+  const originalText = btn.textContent;
+  btn.textContent = 'Exporting...';
+  btn.disabled = true;
+  try {
+    const headers = ['Name','Category','Emoji','Quantity','Unit','Expiry Date','Notes'];
+    const rows = fridgeItems.filter(i => !i.archived).map(it => [it.name,it.category,it.emoji,it.quantity,it.unit,it.expiry_date,it.notes||'']);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'FreshFlow_inventory.csv'; a.click();
+    showToast('CSV exported!');
+  } finally { btn.textContent = originalText; btn.disabled = false; }
+}
+async function confirmDeleteAccount() {
+  showDialog('Delete Account', 'This will permanently delete all your data. Are you sure?', 'Delete', async () => {
+    showToast('Deleting account...');
+    await SB.from('items').delete().eq('user_id', currentUser.id);
+    await SB.from('shopping_list').delete().eq('user_id', currentUser.id);
+    await SB.from('profiles').delete().eq('id', currentUser.id);
+    await SB.auth.signOut();
+    currentUser = null; userProfile = null; fridgeItems = []; shopItems = [];
+    go('v-auth');
+    showToast('Account deleted');
+  });
+}
+
+function applyLang() {
+  document.getElementById('auth-tagline').textContent = t('tagline');
+  document.getElementById('tab-si').textContent = t('signIn');
+  document.getElementById('tab-su').textContent = t('createAcc');
+  const navLabels = { 'nav-lbl-home':'home','nav-lbl-inv':'inventory','nav-lbl-rec':'recipes','nav-lbl-mp':'mealPlan','nav-lbl-shop':'shopping','nav-lbl-alerts':'alerts','nav-lbl-fav':'favorites' };
+  Object.entries(navLabels).forEach(([id,key]) => { const el = document.getElementById(id); if(el) el.textContent = t(key); });
+  ['lang-en-check','lang-zh-check','lang-ms-check'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
+  const chk = document.getElementById('lang-'+LANG+'-check'); if(chk) chk.style.display = '';
+  renderAll();
+}
+function switchLang(l) { LANG = l; localStorage.setItem(CONFIG.LS_KEYS.LANG, l); applyLang(); showToast('Language changed'); }
+function renderAll() {
+  if (currentView === 'v-home') renderHome();
+  else if (currentView === 'v-inv') { renderInvCatScroll(); renderInv(); }
+  else if (currentView === 'v-recipe') { renderCuisineFilter(); renderRecipes(); }
+  else if (currentView === 'v-mealplan') renderMealPlan();
+  else if (currentView === 'v-shop') renderShop();
+  else if (currentView === 'v-alerts') renderAlerts();
+  else if (currentView === 'v-profile') renderProfile();
+  else if (currentView === 'v-favorites') renderFavorites();
+}
+
+// UNDO
+let _undoCallback = null;
+function showUndo(msg, callback) {
+  const bar = document.getElementById('undo-snackbar');
+  document.getElementById('undo-msg').textContent = msg;
+  bar.style.display = 'flex';
+  _undoCallback = callback;
+  clearTimeout(bar._timeout);
+  bar._timeout = setTimeout(() => { bar.style.display = 'none'; _undoCallback = null; }, 5000);
+}
+if (!window._undoListenerBound) {
+  document.body.addEventListener('click', (e) => {
+    if (e.target.id === 'undo-btn') {
+      if (typeof _undoCallback === 'function') _undoCallback();
+      document.getElementById('undo-snackbar').style.display = 'none';
+      _undoCallback = null;
+    }
+  });
+  window._undoListenerBound = true;
+}
+
+// Theme
+function setTheme(theme) {
+  currentTheme = theme;
+  localStorage.setItem(CONFIG.LS_KEYS.THEME, theme);
+  applyTheme();
+  if (currentView === 'v-profile') renderProfile();
+}
+function applyTheme() { if (currentTheme) document.documentElement.setAttribute('data-theme', currentTheme); else document.documentElement.removeAttribute('data-theme'); }
+
+// Avatar (FIXED: now immediately updates local object and persists)
+const AVATAR_EMOJIS = ['🍎','🍊','🍋','🍇','🍓','🥑','🥦','🍕','🍔','🍣','🍰','🧁','🍩','🍪','🥛','🧃','🍵','☕','🥐','🥨','🍒','🥝','🥥','🍍','🌮','🥗','🍜','🍝','🍱','🧆'];
+function pickProfilePhoto() {
+  const grid = document.getElementById('avatar-emoji-grid');
+  grid.innerHTML = AVATAR_EMOJIS.map(e => `<div onclick="selectAvatar('${e}')" style="cursor:pointer;padding:5px;border-radius:12px;background:var(--surface2);transition:var(--transition)">${e}</div>`).join('');
+  openModal('m-avatar');
+}
+async function selectAvatar(emoji) {
+  if (!currentUser) { showToast('Please login first'); return; }
+  showToast('Updating avatar...', 1500);
+  const { error } = await safeCall(
+    () => SB.from('profiles').update({ photo_url: 'emoji:' + emoji }).eq('id', currentUser.id),
+    'Failed to update avatar'
+  );
+  if (!error) {
+    // Immediately update local object, no need to wait for DB refresh
+    userProfile.photo_url = 'emoji:' + emoji;
+    renderProfile();
+    renderHome();
+    closeModal('m-avatar');
+    showToast('Avatar updated successfully!');
+  } else {
+    closeModal('m-avatar');
+    showToast('Failed to update avatar');
+  }
+}
+
+// Onboarding
+const onboardingSteps = [
+  { title: 'Welcome to FreshFlow!', text: 'Track your ingredients, reduce waste, and save money.' },
+  { title: 'Add Items Easily', text: 'Use the + button to add ingredients. Scan barcodes or pick from smart suggestions.' },
+  { title: 'Get Cooking!', text: 'Recipes match your fridge. Meal plan your week and auto‑generate shopping lists.' }
+];
+function startOnboarding() { onboardingStep = 0; showOnboardingStep(); document.getElementById('onboarding-overlay').classList.add('active'); }
+function showOnboardingStep() {
+  const step = onboardingSteps[onboardingStep];
+  document.getElementById('onboarding-title').textContent = step.title;
+  document.getElementById('onboarding-text').textContent = step.text;
+  for (let i=0;i<3;i++) document.getElementById('onboarding-dot-'+i).classList.toggle('active', i === onboardingStep);
+  document.getElementById('onboarding-next').textContent = onboardingStep === 2 ? 'Got it!' : 'Next';
+}
+function nextOnboarding() {
+  if (onboardingStep < 2) { onboardingStep++; showOnboardingStep(); }
+  else { document.getElementById('onboarding-overlay').classList.remove('active'); localStorage.setItem(CONFIG.LS_KEYS.ONBOARDED, 'true'); }
+}
+
+// Close suggestions when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#it-name') && !e.target.closest('#suggestions')) {
+    document.getElementById('suggestions').style.display = 'none';
+  }
+});
+
+// Offline/Online detection
+window.addEventListener('online', () => {
+  document.getElementById('net-indicator').style.display = 'none';
+});
+window.addEventListener('offline', () => {
+  document.getElementById('net-indicator').style.display = 'block';
+});
+
+(async function init() {
+  applyDark();
+  applyTheme();
+  applyLang();
+  go('v-auth');
+  await loadSession();
+})();
+</script>
+</body>
+</html>
