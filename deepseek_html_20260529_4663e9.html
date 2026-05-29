@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#389C9A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FreshFlow">
+<title>FreshFlow</title>
+<link rel="manifest" href="#" id="manifest-link">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/idb-keyval@6/dist/umd.js"></script>
+
+<style>
+/* 所有 CSS 与上一版完全相同，此处省略以节省篇幅，直接使用之前最终版样式 */
+/* 请确保复制完整的 CSS 部分，否则样式会丢失 */
+</style>
+</head>
+<body>
+<!-- 结构同上一版，仅在购物清单顶部添加导出按钮 -->
+<!-- 例如在 <div class="topbar"> 的 h2 后面加一个导出按钮 -->
+<div id="app">
+  <!-- ... 其他视图保持不变 ... -->
+
+  <!-- SHOPPING 页顶部添加导出按钮 -->
+  <div class="view" id="v-shop">
+    <div class="topbar">
+      <h2 id="shop-title">Shopping List</h2>
+      <button class="icon-btn" onclick="exportShopCSV()" title="Export CSV"><i class="ti ti-file-download"></i></button>
+      <button class="icon-btn" onclick="clearDoneShop()" title="Clear checked"><i class="ti ti-trash"></i></button>
+    </div>
+    <!-- 其余代码不变 -->
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ======================== CONFIGURATION ========================
+const CONFIG = {
+  SUPABASE_URL: 'https://qzzmisvsmolojchkfcja.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6em1pc3ZzbW9sb2pjaGtmY2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5OTA4NjUsImV4cCI6MjA5NDU2Njg2NX0.1vphk-48S_io12FZjfvoC80rHWyNEW6N3Lm6XqkeUO8',
+  LS_KEYS: {
+    LANG: 'ff-lang',
+    DARK: 'ff-dark',
+    THEME: 'ff-theme',
+    MEALPLAN: 'ff-mealplan',
+    ONBOARDED: 'ff-onboarded',
+    FAVORITES: 'ff-favorites'
+  }
+};
+
+const SB = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+
+// ... 语言包、变量、函数等完全复用之前最终版 ...
+
+// ======================== 新增功能 1：导出购物清单 CSV ========================
+function exportShopCSV() {
+  const headers = ['Name', 'Category', 'Status'];
+  const rows = shopItems.map(s => [
+    s.name,
+    s.category,
+    s.done ? 'Purchased' : 'To buy'
+  ]);
+  const csv = [headers, ...rows]
+    .map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(','))
+    .join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `FreshFlow_shop_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('Shopping list exported!');
+}
+
+// ======================== 新增功能 2：过期物品自动 Toast 提醒 ========================
+function checkAndNotifyExpiring() {
+  const now = new Date();
+  const expiring = fridgeItems.filter(i => !i.archived && daysUntil(i.expiry_date) >= 0 && daysUntil(i.expiry_date) <= 2);
+  if (expiring.length && document.visibilityState === 'visible') {
+    showToast(`⚠️ ${expiring.length} item(s) expiring within 2 days!`, 3000);
+  }
+}
+
+// 在数据加载完成后调用一次（loadItems 之后）
+// 以及每分钟轮询一次
+let expirationInterval = null;
+function startExpirationCheck() {
+  if (expirationInterval) clearInterval(expirationInterval);
+  checkAndNotifyExpiring();
+  expirationInterval = setInterval(checkAndNotifyExpiring, 60000);
+}
+
+// 修改 loadItems，加载完成后启动检查
+const originalLoadItems = loadItems;
+loadItems = async function() {
+  await originalLoadItems();
+  startExpirationCheck();
+};
+
+// 修改 loadProfile 也触发一次检查
+const originalLoadProfile = loadProfile;
+loadProfile = async function(user) {
+  await originalLoadProfile(user);
+  startExpirationCheck();
+};
+
+// 页面可见性变化时也检查一次
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') checkAndNotifyExpiring();
+});
+
+// ... 其余所有函数保持不变 ...
+
+</script>
+</body>
+</html>
