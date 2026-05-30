@@ -789,7 +789,12 @@
     async function doSignIn() { const email = document.getElementById('si-email').value.trim(); const pass = document.getElementById('si-pass').value; const errEl = document.getElementById('si-err'); if (!email || !pass) { errEl.textContent = t('signInError'); return; } const { error } = await SB.auth.signInWithPassword({ email, password: pass }); if (error) errEl.textContent = error.message; }
     async function doSignUp() { const fn = document.getElementById('su-fn').value.trim(); const ln = document.getElementById('su-ln').value.trim(); const email = document.getElementById('su-email').value.trim(); const pass = document.getElementById('su-pass').value; const house = document.getElementById('su-house').value.trim() || (fn + "'s Kitchen"); const errEl = document.getElementById('su-err'); if (!fn || !email || !pass) { errEl.textContent = t('signUpError'); return; } if (pass.length < 6) { errEl.textContent = t('passwordShort'); return; } const { error } = await SB.auth.signUp({ email, password: pass, options: { data: { display_name: fn+' '+ln, household: house } } }); if (error) errEl.textContent = error.message; else { showToast(t('accountCreated')); authTab('si'); } }
 function doGoogleSignIn() {
-  SB.auth.signInWithOAuth({ provider: 'google' });
+  SB.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: 'https://joweitnay0717-alt.github.io/Fresh-Flow/'
+    }
+  });
 }
     async function doLogout() { await SB.auth.signOut(); currentUser = null; userProfile = null; fridgeItems = []; shopItems = []; localStorage.removeItem(CONFIG.LS_KEYS.FAVORITES); favoriteIds = []; go('v-auth'); }
     async function loadSession() { const { data: { session } } = await SB.auth.getSession(); if (session) await handleUser(session.user); SB.auth.onAuthStateChange(async (event, session) => { if (session) await handleUser(session.user); else go('v-auth'); }); }
