@@ -791,8 +791,36 @@
     function doGoogleSignIn() { SB.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } }); }
     async function doLogout() { await SB.auth.signOut(); currentUser = null; userProfile = null; fridgeItems = []; shopItems = []; localStorage.removeItem(CONFIG.LS_KEYS.FAVORITES); favoriteIds = []; go('v-auth'); }
     async function loadSession() { const { data: { session } } = await SB.auth.getSession(); if (session) await handleUser(session.user); SB.auth.onAuthStateChange(async (event, session) => { if (session) await handleUser(session.user); else go('v-auth'); }); }
-    async function handleUser(user) { currentUser = user; await loadProfile(user); await loadItems(); await loadShop(); go('v-home'); }
+    async function handleUser(user) {
+  currentUser = user;
 
+  try {
+    await loadProfile(user);
+  } catch (e) {
+    console.warn('Profile load failed, using defaults', e);
+    userProfile = {
+      household: 'My Kitchen',
+      categories: ['Dairy','Vegetables','Meat & Fish','Fruits','Grains','Drinks','Frozen','Condiments','Snacks'],
+      avg_item_price: 10
+    };
+  }
+
+  try {
+    await loadItems();
+  } catch (e) {
+    console.warn('Items load failed', e);
+    fridgeItems = [];
+  }
+
+  try {
+    await loadShop();
+  } catch (e) {
+    console.warn('Shop load failed', e);
+    shopItems = [];
+  }
+
+  go('v-home');
+}
     // ========== 修复后的 loadProfile：优先使用服务器语言，并增强回退逻辑 ==========
     async function loadProfile(user) {
         const { data } = await SB.from('profiles').select('*').eq('id', user.id).single();
