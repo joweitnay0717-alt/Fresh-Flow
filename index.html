@@ -1141,7 +1141,82 @@ function doGoogleSignIn() {
     function startBarcodeScanner() { const videoElem = document.getElementById('bc-video'); const status = document.getElementById('bc-status'); status.textContent = t('startingCamera'); if (html5QrCode) { html5QrCode.stop().then(() => { html5QrCode = null; }).catch(()=>{}); } html5QrCode = new Html5Qrcode("bc-video"); videoElem.style.display = 'block'; html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 150 } }, (decodedText, decodedResult) => { stopBarcodeScanner(); lookupBarcode(decodedText); }, (errorMessage) => {}).then(() => { status.textContent = t('pointCamera'); }).catch(err => { status.textContent = t('startingCamera') + ' failed'; console.error(err); }); document.getElementById('barcode-title').textContent = t('scanBarcodeTitle'); document.getElementById('or-type').textContent = t('orTypeManually'); document.getElementById('bc-manual').placeholder = t('enterBarcode'); document.getElementById('btn-lookup').textContent = t('lookUp'); document.getElementById('btn-try-camera').textContent = t('tryCameraScan'); document.getElementById('btn-cancel-scan').textContent = t('cancelScanText'); }
     function stopBarcodeScanner() { if (html5QrCode) { html5QrCode.stop().then(() => { html5QrCode = null; }).catch(()=>{}); } }
     function closeBarcodeScanner() { stopBarcodeScanner(); closeModal('m-barcode'); }
-    async function lookupBarcode(code) { if (!code) return; showToast(t('lookingUp')); try { const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`); const data = await res.json(); if (data.status === 1 && data.product) { closeBarcodeScanner(); openAddItem({ name: data.product.product_name || 'Scanned item' }); } else { closeBarcodeScanner(); showToast(t('productNotFound')); openAddItem({ note: `Barcode: ${code}` }); } } catch(e) { closeBarcodeScanner(); showToast(t('networkError')); openAddItem({ note: `Barcode: ${code}` }); } }
+  // Function to handle the scanned barcode
+async function lookupBarcode(code) {
+  try {
+    console.log(`Scanning barcode: ${code}...`);
+
+    // 1. First, check the global Open Food Facts API
+    const offUrl = `https://world.openfoodfacts.org/api/v0/product/${code}.json`;
+    const response = await fetch(offUrl);
+    const data = await response.json();
+
+    if (data.status === 1 && data.product && data.product.product_name) {
+      // Success! Found in the global database
+      displayResult(data.product.product_name, code);
+      return; // Exit the function early
+    }
+
+    // 2. If not found globally, check your custom Supabase table for local Malaysian items
+    console.log("Not found globally. Checking local Supabase database...");
+    
+    const { data: localData, error: fetchError } = await _supabase
+      .from('malaysian_products')
+      .select('product_name')
+      .eq('barcode', code)
+      .single();
+
+    if (localData && localData.product_name) {
+      // Success! Someone already crowdsourced this local item
+      displayResult(`${localData.product_name} (Local Data)`, code);
+      return; 
+    }
+
+    // 3. If it's not in EITHER database, prompt the user to add it!
+    promptUserToAddNewProduct(code);
+
+  } catch (error) {
+    console.error("Error during barcode lookup:", error);
+    alert("Network error while looking up the product. Please check your connection.");
+  }
+}
+
+// Helper function to handle saving new crowdsourced items
+async function promptUserToAddNewProduct(code) {
+  // Pop up an alert asking the user for the product name (e.g., a specific Sarawakian noodle brand)
+  const newProductName = prompt(`Barcode ${code} not found!\n\nPlease enter the name of this local product to save it for everyone:`);
+
+  // If the user typed something and didn't hit cancel
+  if (newProductName && newProductName.trim() !== "") {
+    
+    // Insert it into Supabase
+    const { error: insertError } = await _supabase
+      .from('malaysian_products')
+      .insert([
+        { barcode: code, product_name: newProductName.trim() }
+      ]);
+
+    if (insertError) {
+      console.error("Failed to save to Supabase:", insertError);
+      alert("Oops! Failed to save the product to the database. Check the console.");
+    } else {
+      // Successfully saved!
+      alert(`Awesome! "${newProductName.trim()}" has been added to our local database.`);
+      displayResult(`${newProductName.trim()} (New Local)`, code);
+    }
+  } else {
+    // User hit cancel or left it blank
+    console.log("User cancelled adding a new product.");
+  }
+}
+
+// Function to update the UI (Make sure you have an HTML element with id="result")
+function displayResult(productName, barcode) {
+  document.getElementById('result').innerHTML = `
+    <strong>Product Found:</strong> ${productName} <br>
+    <small>Barcode: ${barcode}</small>
+  `;
+}
 
     function renderCuisineFilter() {
         const cuisines = ['All', ...new Set(RECIPES.map(r => r.cuisine))];
