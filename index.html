@@ -790,8 +790,10 @@
     async function doSignUp() { const fn = document.getElementById('su-fn').value.trim(); const ln = document.getElementById('su-ln').value.trim(); const email = document.getElementById('su-email').value.trim(); const pass = document.getElementById('su-pass').value; const house = document.getElementById('su-house').value.trim() || (fn + "'s Kitchen"); const errEl = document.getElementById('su-err'); if (!fn || !email || !pass) { errEl.textContent = t('signUpError'); return; } if (pass.length < 6) { errEl.textContent = t('passwordShort'); return; } const { error } = await SB.auth.signUp({ email, password: pass, options: { data: { display_name: fn+' '+ln, household: house } } }); if (error) errEl.textContent = error.message; else { showToast(t('accountCreated')); authTab('si'); } }
 function doGoogleSignIn() {
   SB.auth.signInWithOAuth({
-    provider: 'google'
-    // 不写 redirectTo，让 Supabase 用 Site URL
+    provider: 'google',
+    options: {
+      redirectTo: 'https://joweitnay0717-alt.github.io/Fresh-Flow/'
+    }
   });
 }
     async function doLogout() { await SB.auth.signOut(); currentUser = null; userProfile = null; fridgeItems = []; shopItems = []; localStorage.removeItem(CONFIG.LS_KEYS.FAVORITES); favoriteIds = []; go('v-auth'); }
@@ -1381,20 +1383,6 @@ function doGoogleSignIn() {
     window.addEventListener('online', () => { document.getElementById('net-indicator').style.display = 'none'; });
     window.addEventListener('offline', () => { document.getElementById('net-indicator').style.display = 'block'; });
 (async function init() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const code = urlParams.get('code');
-  if (code) {
-    console.log('检测到 OAuth code，正在交换 session...');
-    const { data, error } = await SB.auth.exchangeCodeForSession(code);
-    if (error) {
-      console.error('交换 session 失败:', error);
-      window.location.replace('https://joweitnay0717-alt.github.io/Fresh-Flow/');
-      return;
-    }
-    console.log('登录成功，session:', data);
-    window.location.replace('https://joweitnay0717-alt.github.io/Fresh-Flow/');
-    return;
-  }
   applyDark();
   applyTheme();
   applyLang();
