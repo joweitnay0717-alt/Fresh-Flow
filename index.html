@@ -1380,7 +1380,7 @@ function doGoogleSignIn() {
     });
     window.addEventListener('online', () => { document.getElementById('net-indicator').style.display = 'none'; });
     window.addEventListener('offline', () => { document.getElementById('net-indicator').style.display = 'block'; });
-((async function init() {
+(async function init() {
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get('code');
   if (code) {
