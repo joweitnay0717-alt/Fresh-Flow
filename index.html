@@ -1380,8 +1380,7 @@ function doGoogleSignIn() {
     });
     window.addEventListener('online', () => { document.getElementById('net-indicator').style.display = 'none'; });
     window.addEventListener('offline', () => { document.getElementById('net-indicator').style.display = 'block'; });
-    ((async function init() {
-  // 处理 Google 回调（当 URL 包含 ?code= 时）
+((async function init() {
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get('code');
   if (code) {
@@ -1389,29 +1388,19 @@ function doGoogleSignIn() {
     const { data, error } = await SB.auth.exchangeCodeForSession(code);
     if (error) {
       console.error('交换 session 失败:', error);
-      // 清除错误参数，跳回干净主页
       window.location.replace('https://joweitnay0717-alt.github.io/Fresh-Flow/');
       return;
     }
     console.log('登录成功，session:', data);
-    // 清除 URL 中的参数
     window.location.replace('https://joweitnay0717-alt.github.io/Fresh-Flow/');
     return;
   }
-
-  // 你原来的 init 代码（applyDark, applyTheme, go, loadSession 等）
   applyDark();
   applyTheme();
   applyLang();
   go('v-auth');
   await loadSession();
 })();
-        applyDark();
-        applyTheme();
-        applyLang();
-        go('v-auth');
-        await loadSession();
-    })();
     </script>
 </body>
 </html>
