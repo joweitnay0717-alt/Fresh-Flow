@@ -266,10 +266,64 @@
                 <div id="home-skeleton" style="display:none"><div class="skeleton" style="height:120px;margin-bottom:14px;border-radius:var(--radius)"></div><div class="skeleton" style="height:60px;margin-bottom:10px;border-radius:var(--radius-sm)"></div><div class="skeleton" style="height:60px;border-radius:var(--radius-sm)"></div></div>
                 <div class="ptr" id="home-ptr"><i class="ti ti-refresh spin-dark"></i> <span id="home-ptr-text">Refreshing…</span></div>
                 <div id="h-tip-card" style="display:none;background:var(--green-l);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;font-size:13px;cursor:pointer" onclick="this.style.display='none'">💡 <b id="h-tip-title">New to FreshFlow?</b> <span id="h-tip-desc">Add your first item with the + button in Inventory, then explore Recipes that match your fridge. Tap here to dismiss.</span></div>
-                <!-- Proactive Food Alert Banner -->
-<div id="h-alert-banner" style="display:none;background:var(--red-l);color:var(--red);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;font-size:13px;font-weight:700;align-items:center;gap:8px;">
-  <span>⚠️</span> <span id="h-alert-banner-text">You have items expiring soon!</span>
-</div>
+               // Real Phone Notification AND Inside-App Banner System
+    async function checkProactiveFoodAlerts() {
+      const alertBanner = document.getElementById('h-alert-banner');
+      const alertText = document.getElementById('h-alert-banner-text');
+      
+      // Filter active items expiring in 3 days or less
+      const urgentItems = fridgeItems.filter(i => !i.archived && daysUntil(i.expiry_date) >= 0 && daysUntil(i.expiry_date) <= 3);
+
+      // ==========================================
+      // CONTROLLER 1: Inside-App Banner Notification
+      // ==========================================
+      if (urgentItems.length > 0 && alertBanner && alertText) {
+        // Localized language translation text for the inside-app banner
+        if (LANG === 'zh') {
+          alertText.textContent = `注意！您有 ${urgentItems.length} 个食材即将过期，请尽快处理！`;
+        } else if (LANG === 'ms') {
+          alertText.textContent = `Amaran! Anda mempunyai ${urgentItems.length} bahan hampir luput!`;
+        } else {
+          const itemWord = urgentItems.length === 1 ? 'item' : 'items';
+          alertText.textContent = `Warning! You have ${urgentItems.length} ${itemWord} expiring within 3 days!`;
+        }
+        // Force the app design layout to display the red alert card
+        alertBanner.style.display = 'flex';
+      } else if (alertBanner) {
+        // Hide it if everything is safe and fresh
+        alertBanner.style.display = 'none';
+        return; // Exit early if there are no bad items
+      }
+
+      // ==========================================
+      // CONTROLLER 2: Real Phone Screen Pop-up Alert
+      // ==========================================
+      // Ask the phone operating system for permission if it hasn't answered yet
+      if (Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+
+      // If allowed by the user, send it out to the system lock screen tray!
+      if (Notification.permission === 'granted' && navigator.serviceWorker.controller) {
+        let title = "FreshFlow Alert! ⚠️";
+        let body = `You have ${urgentItems.length} items expiring soon. Don't let them go to waste!`;
+
+        if (LANG === 'zh') {
+          title = "FreshFlow 临期提醒! ⚠️";
+          body = `您有 ${urgentItems.length} 个食材即将过期，记得及时烹饪哦！`;
+        } else if (LANG === 'ms') {
+          title = "Amaran FreshFlow! ⚠️";
+          body = `Anda mempunyai ${urgentItems.length} bahan yang hampir luput!`;
+        }
+
+        // Drop the notification straight to the phone background assistant (sw.js)
+        navigator.serviceWorker.controller.postMessage({
+          type: 'SHOW_NOTIFICATION',
+          title: title,
+          body: body
+        });
+      }
+    }
 
 <!-- Gamification Stats Widget -->
 <div class="card-sm" style="background:var(--amber-l);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--amber);">
@@ -829,6 +883,20 @@ function doGoogleSignIn() {
     async function handleUser(user) {
   currentUser = user;
 
+  try {
+    await loadShop();
+  } catch (e) {
+    console.warn('Shop load failed', e);
+    shopItems = [];
+  }
+
+  go('v-home');
+  
+  // TRIGGER THE POP-UP NOTIFICATION RIGHT HERE AFTER EVERYTHING LOADS!
+  setTimeout(() => {
+    checkProactiveFoodAlerts();
+  }, 1000); 
+}
   try {
     await loadProfile(user);
   } catch (e) {
@@ -1641,9 +1709,15 @@ function doGoogleSignIn() {
   go('v-auth');
   await loadSession();
   
-  // RUN SYSTEM ENGINES NOW
+  // Register our background assistant (sw.js) for real phone notifications
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('Background assistant registered!'))
+      .catch(err => console.error('Assistant setup failed:', err));
+  }
+
+  // Run Gamification systems
   initGamificationSystem();
-  checkProactiveFoodAlerts();
 })();
     // ========================================================
     // GAMIFICATION & PROACTIVE ALERT ENGINE 
