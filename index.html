@@ -1186,9 +1186,9 @@ async function lookupBarcode(code) {
     // 3. If it's not in EITHER database, prompt the user to add it!
     promptUserToAddNewProduct(code);
 
-  } catch (error) {
-    console.error("Error during barcode lookup:", error);
-    alert("Network error while looking up the product. Please check your connection.");
+} catch (error) {
+    // This will force the app to pop up the EXACT technical reason it failed
+    alert(`The real error is: ${error.message}`);
   }
 }
 
