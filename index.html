@@ -266,70 +266,16 @@
                 <div id="home-skeleton" style="display:none"><div class="skeleton" style="height:120px;margin-bottom:14px;border-radius:var(--radius)"></div><div class="skeleton" style="height:60px;margin-bottom:10px;border-radius:var(--radius-sm)"></div><div class="skeleton" style="height:60px;border-radius:var(--radius-sm)"></div></div>
                 <div class="ptr" id="home-ptr"><i class="ti ti-refresh spin-dark"></i> <span id="home-ptr-text">Refreshing…</span></div>
                 <div id="h-tip-card" style="display:none;background:var(--green-l);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;font-size:13px;cursor:pointer" onclick="this.style.display='none'">💡 <b id="h-tip-title">New to FreshFlow?</b> <span id="h-tip-desc">Add your first item with the + button in Inventory, then explore Recipes that match your fridge. Tap here to dismiss.</span></div>
-               // Real Phone Notification AND Inside-App Banner System
-    async function checkProactiveFoodAlerts() {
-      const alertBanner = document.getElementById('h-alert-banner');
-      const alertText = document.getElementById('h-alert-banner-text');
-      
-      // Filter active items expiring in 3 days or less
-      const urgentItems = fridgeItems.filter(i => !i.archived && daysUntil(i.expiry_date) >= 0 && daysUntil(i.expiry_date) <= 3);
+                
+                <div id="h-alert-banner" style="display:none;background:var(--red-l);color:var(--red);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;font-size:13px;font-weight:700;align-items:center;gap:8px;">
+                  <span>⚠️</span> <span id="h-alert-banner-text">You have items expiring soon!</span>
+                </div>
 
-      // ==========================================
-      // CONTROLLER 1: Inside-App Banner Notification
-      // ==========================================
-      if (urgentItems.length > 0 && alertBanner && alertText) {
-        // Localized language translation text for the inside-app banner
-        if (LANG === 'zh') {
-          alertText.textContent = `注意！您有 ${urgentItems.length} 个食材即将过期，请尽快处理！`;
-        } else if (LANG === 'ms') {
-          alertText.textContent = `Amaran! Anda mempunyai ${urgentItems.length} bahan hampir luput!`;
-        } else {
-          const itemWord = urgentItems.length === 1 ? 'item' : 'items';
-          alertText.textContent = `Warning! You have ${urgentItems.length} ${itemWord} expiring within 3 days!`;
-        }
-        // Force the app design layout to display the red alert card
-        alertBanner.style.display = 'flex';
-      } else if (alertBanner) {
-        // Hide it if everything is safe and fresh
-        alertBanner.style.display = 'none';
-        return; // Exit early if there are no bad items
-      }
+                <div class="card-sm" style="background:var(--amber-l);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--amber);">
+                  <div style="font-size:13px;font-weight:700;color:#BF360C;">🔥 Streak: <span id="game-streak">1 day</span></div>
+                  <div style="font-size:13px;font-weight:700;color:#BF360C;">⭐ Points: <span id="game-points">0 XP</span></div>
+                </div>
 
-      // ==========================================
-      // CONTROLLER 2: Real Phone Screen Pop-up Alert
-      // ==========================================
-      // Ask the phone operating system for permission if it hasn't answered yet
-      if (Notification.permission === 'default') {
-        await Notification.requestPermission();
-      }
-
-      // If allowed by the user, send it out to the system lock screen tray!
-      if (Notification.permission === 'granted' && navigator.serviceWorker.controller) {
-        let title = "FreshFlow Alert! ⚠️";
-        let body = `You have ${urgentItems.length} items expiring soon. Don't let them go to waste!`;
-
-        if (LANG === 'zh') {
-          title = "FreshFlow 临期提醒! ⚠️";
-          body = `您有 ${urgentItems.length} 个食材即将过期，记得及时烹饪哦！`;
-        } else if (LANG === 'ms') {
-          title = "Amaran FreshFlow! ⚠️";
-          body = `Anda mempunyai ${urgentItems.length} bahan yang hampir luput!`;
-        }
-
-        // Drop the notification straight to the phone background assistant (sw.js)
-        navigator.serviceWorker.controller.postMessage({
-          type: 'SHOW_NOTIFICATION',
-          title: title,
-          body: body
-        });
-      }
-    }
-
-<!-- Gamification Stats Widget -->
-<div class="card-sm" style="background:var(--amber-l);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--amber);">
-  <div style="font-size:13px;font-weight:700;color:#BF360C;">🔥 Streak: <span id="game-streak">1 day</span></div>
-  <div style="font-size:13px;font-weight:700;color:#BF360C;">⭐ Points: <span id="game-points">0 XP</span></div>
-</div>
                 <div class="fridge-card">
                     <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.6px;margin-bottom:12px" id="h-date"></div>
                     <div style="display:flex;align-items:center;gap:20px;margin-bottom:12px">
@@ -881,49 +827,40 @@ function doGoogleSignIn() {
     async function doLogout() { await SB.auth.signOut(); currentUser = null; userProfile = null; fridgeItems = []; shopItems = []; localStorage.removeItem(CONFIG.LS_KEYS.FAVORITES); favoriteIds = []; go('v-auth'); }
     async function loadSession() { const { data: { session } } = await SB.auth.getSession(); if (session) await handleUser(session.user); SB.auth.onAuthStateChange(async (event, session) => { if (session) await handleUser(session.user); else go('v-auth'); }); }
     async function handleUser(user) {
-  currentUser = user;
+        currentUser = user;
 
-  try {
-    await loadShop();
-  } catch (e) {
-    console.warn('Shop load failed', e);
-    shopItems = [];
-  }
+        try {
+            await loadProfile(user);
+        } catch (e) {
+            console.warn('Profile load failed, using defaults', e);
+            userProfile = {
+                household: 'My Kitchen',
+                categories: ['Dairy','Vegetables','Meat & Fish','Fruits','Grains','Drinks','Frozen','Condiments','Snacks'],
+                avg_item_price: 10
+            };
+        }
 
-  go('v-home');
-  
-  // TRIGGER THE POP-UP NOTIFICATION RIGHT HERE AFTER EVERYTHING LOADS!
-  setTimeout(() => {
-    checkProactiveFoodAlerts();
-  }, 1000); 
-}
-  try {
-    await loadProfile(user);
-  } catch (e) {
-    console.warn('Profile load failed, using defaults', e);
-    userProfile = {
-      household: 'My Kitchen',
-      categories: ['Dairy','Vegetables','Meat & Fish','Fruits','Grains','Drinks','Frozen','Condiments','Snacks'],
-      avg_item_price: 10
-    };
-  }
+        try {
+            await loadItems();
+        } catch (e) {
+            console.warn('Items load failed', e);
+            fridgeItems = [];
+        }
 
-  try {
-    await loadItems();
-  } catch (e) {
-    console.warn('Items load failed', e);
-    fridgeItems = [];
-  }
+        try {
+            await loadShop();
+        } catch (e) {
+            console.warn('Shop load failed', e);
+            shopItems = [];
+        }
 
-  try {
-    await loadShop();
-  } catch (e) {
-    console.warn('Shop load failed', e);
-    shopItems = [];
-  }
-
-  go('v-home');
-}
+        go('v-home');
+        
+        // Kicks off both system and internal app alerts after database info drops in cleanly
+        setTimeout(() => {
+            checkProactiveFoodAlerts();
+        }, 1000); 
+    }
     // ========== 修复后的 loadProfile：优先使用服务器语言，并增强回退逻辑 ==========
     async function loadProfile(user) {
         const { data } = await SB.from('profiles').select('*').eq('id', user.id).single();
@@ -1841,6 +1778,56 @@ function doGoogleSignIn() {
       rewardPoints(30, "Saved food from being wasted!");
       confetti(); // Trigger reward animation
     };
+
+      // ========================================================
+    // COMBINED NOTIFICATION AND REAL-PHONE ALERT ENGINE
+    // ========================================================
+    async function checkProactiveFoodAlerts() {
+      const alertBanner = document.getElementById('h-alert-banner');
+      const alertText = document.getElementById('h-alert-banner-text');
+      
+      const urgentItems = fridgeItems.filter(i => !i.archived && daysUntil(i.expiry_date) >= 0 && daysUntil(i.expiry_date) <= 3);
+
+      // Task 1: Render the Inside-App Banner layout card instantly
+      if (urgentItems.length > 0 && alertBanner && alertText) {
+        if (LANG === 'zh') {
+          alertText.textContent = `注意！您有 ${urgentItems.length} 个食材即将过期，请尽快处理！`;
+        } else if (LANG === 'ms') {
+          alertText.textContent = `Amaran! Anda mempunyai ${urgentItems.length} bahan hampir luput!`;
+        } else {
+          const itemWord = urgentItems.length === 1 ? 'item' : 'items';
+          alertText.textContent = `Warning! You have ${urgentItems.length} ${itemWord} expiring within 3 days!`;
+        }
+        alertBanner.style.display = 'flex';
+      } else if (alertBanner) {
+        alertBanner.style.display = 'none';
+        return; 
+      }
+
+      // Task 2: Push a hard notification directly to the native phone lock screen tray
+      if (Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+
+      if (Notification.permission === 'granted' && navigator.serviceWorker.controller) {
+        let title = "FreshFlow Alert! ⚠️";
+        let body = `You have ${urgentItems.length} items expiring soon. Don't let them go to waste!`;
+
+        if (LANG === 'zh') {
+          title = "FreshFlow 临期提醒! ⚠️";
+          body = `您有 ${urgentItems.length} 个食材即将过期，记得及时烹饪哦！`;
+        } else if (LANG === 'ms') {
+          title = "Amaran FreshFlow! ⚠️";
+          body = `Anda mempunyai ${urgentItems.length} bahan yang hampir luput!`;
+        }
+
+        navigator.serviceWorker.controller.postMessage({
+          type: 'SHOW_NOTIFICATION',
+          title: title,
+          body: body
+        });
+      }
+    }
     </script>
 </body>
 </html>
