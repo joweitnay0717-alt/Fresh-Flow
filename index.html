@@ -1154,59 +1154,105 @@ function doGoogleSignIn() {
     function closeBarcodeScanner() { stopBarcodeScanner(); closeModal('m-barcode'); }
   // Function to handle the scanned barcode
 // ========================================================
-    // 1. MALAYSIAN MEGA DICTIONARY & AUTO-DETECTOR SYSTEM
+    // 1. COMPREHENSIVE MALAYSIAN MEGA DICTIONARY (Expanded)
     // ========================================================
     const commonFoods = [
-      // --- PROTEIN & MEAT ---
-      "Chicken / Ayam / 鸡肉", "Beef / Daging Lembu / 牛肉", "Mutton / Daging Kambing / 羊肉", 
-      "Pork / Daging Babi / 猪肉", "Egg / Telur / 鸡蛋", "Duck / Itik / 鸭肉",
-      
-      // --- SEAFOOD ---
-      "Fish / Ikan / 鱼", "Prawn / Udang / 虾", "Squid / Sotong / 苏东", 
-      "Crab / Ketam / 螃蟹", "Anchovies / Ikan Bilis / 江鱼仔", "Cockles / Kerang / 鲜蛤",
+      // --- POULTRY & MEAT (VARIOUS CUTS) ---
+      "Chicken / Ayam / 鸡肉", "Chicken Breast / Dada Ayam / 鸡胸肉", "Chicken Thigh / Peha Ayam / 鸡腿肉", 
+      "Chicken Wing / Sayap Ayam / 鸡翅膀", "Minced Chicken / Ayam Cincang / 鸡肉碎",
+      "Beef / Daging Lembu / 牛肉", "Minced Beef / Daging Lembu Cincang / 牛肉碎", "Beef Tendon / Urat Lembu / 牛筋", 
+      "Beef Strips / Daging Hiris / 牛肉片", "Mutton / Daging Kambing / 羊肉", "Lamb Chop / Lamb Chop / 羊排",
+      "Pork / Daging Babi / 猪肉", "Minced Pork / Babi Cincang / 猪肉碎", "Pork Belly / Babi Tiga Rasa / 五花肉", 
+      "Duck / Itik / 鸭肉", "Egg / Telur / 鸡蛋", "Salted Egg / Telur Masin / 咸蛋", "Century Egg / Telur Pidan / 皮蛋", 
+      "Quail Egg / Telur Puyuh / 鹌鹑蛋", "Sausage / Sosej / 香肠", "Bacon / Bakon / 培根", "Ham / Ham / 火腿",
 
-      // --- CARBS & NOODLES ---
-      "White Rice / Nasi Putih / 白饭", "Yellow Noodles / Mee Kuning / 黄面", 
-      "Rice Vermicelli / Bihun / 米粉", "Flat Rice Noodles / Kuey Teow / 粿条", 
-      "Bread / Roti / 面包", "Instant Noodles / Maggi / 快熟面", 
-      "Kolo Mee / Kolo Mee / 哥罗面", "Sarawak Laksa / Laksa Sarawak / 砂拉越叻沙",
+      // --- SEAFOOD & PROCESSED SEAFOOD ---
+      "Fish / Ikan / 鱼", "Sea Bass (Siakap) / Ikan Siakap / 鲈鱼", "Tilapia / Ikan Talapia / 罗非鱼", 
+      "Mackerel / Ikan Tenggiri / 鲛鱼", "Pomfret / Ikan Bawal / 鲳鱼", "Salmon / Ikan Salmon / 三文鱼", 
+      "Tuna / Ikan Tuna / 金枪鱼", "Anchovies / Ikan Bilis / 江鱼仔", "Sardine / Sardin / 沙丁鱼",
+      "Prawn / Udang / 虾", "Squid / Sotong / 苏东", "Squid Ring / Sotong Gelang / 苏东圈",
+      "Crab / Ketam / 螃蟹", "Cockles / Kerang / 鲜蛤", "Clams (Lala) / Lala / 啦啦", 
+      "Mussels / Kupang / 青口贝", "Oyster / Tiram / 生蚝", "Scallop / Kekapis / 扇贝",
+      "Dried Shrimp / Udang Kering / 虾米", "Fish Ball / Bebola Ikan / 鱼丸", "Fish Cake / Kek Ikan / 鱼饼", 
+      "Crab Stick / Jejari Ketam / 蟹柳",
 
-      // --- VEGETABLES ---
-      "Cabbage / Kubis / 包菜", "Water Spinach / Kangkung / 空心菜", 
-      "Spinach / Bayam / 菠菜", "Bean Sprouts / Taugeh / 豆芽", 
-      "Eggplant / Terung / 茄子", "Bitter Gourd / Peria / 苦瓜", 
-      "Long Beans / Kacang Panjang / 长豆", "Lady's Finger / Bendi / 秋葵", 
-      "Midin / Midin / 米林", "Paku / Pucuk Paku / 巴菇菜", 
-      "Carrot / Lobak Merah / 红萝卜", "Potato / Ubi Kentang / 马铃薯",
-      "Sweet Potato / Ubi Keledek / 番薯", "Tapioca / Ubi Kayu / 木薯",
+      // --- CARBS, GRAINS & NOODLES ---
+      "White Rice / Nasi Putih / 白饭", "Brown Rice / Beras Perang / 糙米", "Basmati Rice / Beras Basmati / 印度香米", 
+      "Glutinous Rice / Beras Pulut / 糯米", "Oats / Oat / 燕麦", "Barley / Barli / 薏米",
+      "Yellow Noodles / Mee Kuning / 黄面", "Rice Vermicelli / Bihun / 米粉", "Flat Rice Noodles / Kuey Teow / 粿条", 
+      "Instant Noodles / Maggi / 快熟面", "Kolo Mee / Kolo Mee / 哥罗面", "Sarawak Laksa / Laksa Sarawak / 砂拉越叻沙",
+      "Macaroni / Makaroni / 通心粉", "Spaghetti / Spageti / 意大利面", "Glass Noodles / Tang Hoon / 冬粉", 
+      "Soba Noodles / Mee Soba / 荞麦面", "Udon Noodles / Mee Udon / 乌冬面", "Mee Suah / Mee Suah / 面线", 
+      "Ban Mian / Pan Mee / 板面", "Bread / Roti / 面包", "Burger Buns / Roti Burger / 汉堡面包", 
+      "Wraps (Tortilla) / Roti Balut / 墨西哥薄饼",
 
-      // --- AROMATICS & SPICES ---
-      "Garlic / Bawang Putih / 蒜头", "Red Onion / Bawang Merah / 红葱头", 
-      "Big Onion / Bawang Besar / 洋葱", "Ginger / Halia / 姜", 
-      "Lemongrass / Serai / 香茅", "Galangal / Lengkuas / 南姜", 
-      "Turmeric / Kunyit / 黄姜", "Chili / Cili / 辣椒", 
-      "Dried Chili / Cili Kering / 辣椒干", "Curry Leaves / Daun Kari / 咖喱叶", 
-      "Pandan Leaves / Daun Pandan / 班兰叶", "Coriander / Ketumbar / 香菜",
+      // --- LEAFY GREENS & VEGETABLES ---
+      "Cabbage / Kubis / 包菜", "Water Spinach / Kangkung / 空心菜", "Spinach / Bayam / 菠菜", 
+      "Bok Choy / Sawi Putih / 小白菜", "Choy Sum / Sawi / 菜心", "Sweet Potato Leaves / Daun Keledek / 番薯叶", 
+      "Lettuce / Daun Salad / 生菜", "Celery / Saderi / 芹菜", "Leek / Daun Bawang (Besar) / 韭葱", 
+      "Spring Onion / Daun Bawang / 青葱", "Midin / Midin / 米林", "Paku / Pucuk Paku / 巴菇菜",
+      "Broccoli / Brokoli / 西兰花", "Cauliflower / Bunga Kubis / 白色花椰菜", "Bean Sprouts / Taugeh / 豆芽", 
+      "Eggplant / Terung / 茄子", "Bitter Gourd / Peria / 苦瓜", "Long Beans / Kacang Panjang / 长豆", 
+      "Lady's Finger / Bendi / 秋葵", "French Beans / Kacang Buncis / 四季豆", "Snow Peas / Kacang Buncis Eropah / 荷兰豆",
+      "Carrot / Lobak Merah / 红萝卜", "White Radish / Lobak Putih / 白萝卜", "Potato / Ubi Kentang / 马铃薯",
+      "Sweet Potato / Ubi Keledek / 番薯", "Tapioca / Ubi Kayu / 木薯", "Pumpkin / Labu / 南瓜", 
+      "Cucumber / Timun / 黄瓜", "Tomato / Tomato / 番茄", "Bell Pepper (Capsicum) / Lada Benggala / 灯笼椒", 
+      "Lotus Root / Akar Teratai / 莲藕", "Corn / Jagung / 玉米",
 
-      // --- CONDIMENTS & SAUCES ---
+      // --- MUSHROOMS & SOY PRODUCTS ---
+      "Enoki Mushroom / Cendawan Enoki / 金针菇", "Shiitake Mushroom / Cendawan Shiitake / 香菇", 
+      "Oyster Mushroom / Cendawan Tiram / 平菇", "Button Mushroom / Cendawan Butang / 口蘑",
+      "Tofu / Tauhu / 豆腐", "Egg Tofu / Tauhu Telur / 日本豆腐", "Tofu Puffs / Tauhu Pok / 豆腐卜", 
+      "Tempeh / Tempe / 天贝", "Yuba (Bean Curd Skin) / Fucuk / 腐竹",
+
+      // --- AROMATICS, HERBS & SPICES ---
+      "Garlic / Bawang Putih / 蒜头", "Red Onion / Bawang Merah / 红葱头", "Big Onion / Bawang Besar / 洋葱", 
+      "Ginger / Halia / 姜", "Lemongrass / Serai / 香茅", "Galangal / Lengkuas / 南姜", 
+      "Turmeric / Kunyit / 黄姜", "Chili / Cili / 辣椒", "Bird's Eye Chili / Cili Padi / 小米辣", 
+      "Dried Chili / Cili Kering / 辣椒干", "Chili Flakes / Kepingan Cili / 辣椒碎", 
+      "Curry Leaves / Daun Kari / 咖喱叶", "Pandan Leaves / Daun Pandan / 班兰叶", "Coriander / Ketumbar / 香菜",
+      "Mint Leaves / Daun Pudina / 薄荷叶", "Basil / Daun Selasih / 罗勒", 
+      "Cinnamon / Kayu Manis / 桂皮", "Star Anise / Bunga Lawang / 八角", "Cardamom / Buah Pelaga / 豆蔻", 
+      "Clove / Bunga Cengkih / 丁香", "Coriander Seeds / Biji Ketumbar / 芫荽籽", "Cumin / Jintan Putih / 孜然", 
+      "Fennel / Jintan Manis / 茴香", "Curry Powder / Serbuk Kari / 咖喱粉", "Five Spice Powder / Serbuk Rempah Lima / 五香粉", 
+      "White Pepper / Lada Putih / 白胡椒", "Black Pepper / Lada Hitam / 黑胡椒",
+
+      // --- CONDIMENTS, SAUCES & OILS ---
       "Soy Sauce / Kicap Masin / 酱油 (生抽)", "Dark Soy Sauce / Kicap Pekat / 黑酱油 (老抽)", 
       "Sweet Soy Sauce / Kicap Manis / 甜酱油", "Oyster Sauce / Sos Tiram / 蚝油", 
       "Chili Sauce / Sos Cili / 辣椒酱", "Tomato Sauce / Sos Tomato / 番茄酱", 
-      "Shrimp Paste / Belacan / 峇拉煎", "Cincalok / Cincalok / 虾酱", 
-      "Coconut Milk / Santan / 椰奶", "Cooking Oil / Minyak Masak / 食用油", 
-      "Sesame Oil / Minyak Bijan / 芝麻油", "Salt / Garam / 盐", "Sugar / Gula / 糖",
+      "Fish Sauce / Sos Ikan / 鱼露", "Sesame Sauce / Sos Bijan / 芝麻酱", "Hoisin Sauce / Sos Hoisin / 海鲜酱",
+      "Shrimp Paste / Belacan / 峇拉煎", "Cincalok / Cincalok / 虾酱", "Sambal / Sambal / 参巴酱",
+      "Fermented Bean Paste (Tauchu) / Taucu / 豆酱", "Mayonnaise / Mayonis / 蛋黄酱", 
+      "Vinegar / Cuka / 醋", "Apple Cider Vinegar / Cuka Epal / 苹果醋",
+      "Cooking Oil / Minyak Masak / 食用油", "Olive Oil / Minyak Zaitun / 橄榄油", "Sesame Oil / Minyak Bijan / 芝麻油", 
+      "Peanut Oil / Minyak Kacang / 花生油", "Butter / Mentega / 黄油", "Margarine / Marjerin / 人造黄油",
+
+      // --- BAKING, SWEETENERS & DRY GOODS ---
+      "Salt / Garam / 盐", "Sugar / Gula / 糖", "Brown Sugar / Gula Perang / 红糖", 
+      "Rock Sugar / Gula Batu / 冰糖", "Palm Sugar (Gula Melaka) / Gula Melaka / 椰糖", "Honey / Madu / 蜂蜜",
+      "All Purpose Flour / Tepung Gandum / 普通面粉", "Cornstarch / Tepung Jagung / 玉米淀粉", 
+      "Tapioca Flour / Tepung Ubi Kayu / 木薯粉", "Rice Flour / Tepung Beras / 粘米粉", 
+      "Baking Powder / Serbuk Penaik / 泡打粉", "Baking Soda / Soda Bikarbonat / 小苏打", "Yeast / Yis / 酵母", 
+      "Cocoa Powder / Serbuk Koko / 可可粉",
 
       // --- DRINKS & DAIRY ---
-      "Condensed Milk / Susu Pekat / 炼奶", "Evaporated Milk / Susu Cair / 淡奶", 
-      "Fresh Milk / Susu Segar / 鲜奶", "Milo / Milo / 美禄", 
-      "Coffee Powder / Serbuk Kopi / 咖啡粉", "Tea Dust / Serbuk Teh / 茶粉",
+      "Coconut Milk / Santan / 椰奶", "Condensed Milk / Susu Pekat / 炼奶", "Evaporated Milk / Susu Cair / 淡奶", 
+      "Fresh Milk / Susu Segar / 鲜奶", "Soy Milk / Susu Soya / 豆奶", "Almond Milk / Susu Badam / 杏仁奶",
+      "Cheddar Cheese / Keju Cheddar / 切达奶酪", "Mozzarella / Keju Mozzarella / 马苏里拉奶酪", 
+      "Yogurt / Yogurt / 酸奶", "Whipping Cream / Krim Pukul / 淡奶油",
+      "Milo / Milo / 美禄", "Coffee Beans / Biji Kopi / 咖啡豆", "Coffee Powder / Serbuk Kopi / 咖啡粉", 
+      "Tea Dust / Serbuk Teh / 茶粉", "Green Tea / Teh Hijau / 绿茶",
 
       // --- FRUITS ---
       "Banana / Pisang / 香蕉", "Papaya / Betik / 木瓜", "Watermelon / Tembikai / 西瓜", 
       "Pineapple / Nanas / 黄梨", "Mango / Mangga / 芒果", "Durian / Durian / 榴莲", 
-      "Rambutan / Rambutan / 红毛丹", "Mangosteen / Manggis / 山竹"
+      "Rambutan / Rambutan / 红毛丹", "Mangosteen / Manggis / 山竹", "Langsat / Langsat / 兰撒",
+      "Apple / Epal / 苹果", "Orange / Oren / 橙子", "Grape / Anggur / 葡萄", "Strawberry / Strawberi / 草莓", 
+      "Kiwi / Kiwi / 猕猴桃", "Dragon Fruit / Buah Naga / 火龙果", "Guava / Jambu Batu / 番石榴", 
+      "Starfruit / Belimbing / 杨桃", "Lemon / Lemon / 柠檬", "Lime (Limau Kasturi) / Limau Kasturi / 酸柑", 
+      "Coconut / Kelapa / 椰子", "Pear / Pear / 梨"
     ];
-
     let customDatabaseFoods = [];
 
     // Fetches custom foods scanned into your Supabase table to expand the dictionary
