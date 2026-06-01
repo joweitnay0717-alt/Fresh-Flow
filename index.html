@@ -266,6 +266,16 @@
                 <div id="home-skeleton" style="display:none"><div class="skeleton" style="height:120px;margin-bottom:14px;border-radius:var(--radius)"></div><div class="skeleton" style="height:60px;margin-bottom:10px;border-radius:var(--radius-sm)"></div><div class="skeleton" style="height:60px;border-radius:var(--radius-sm)"></div></div>
                 <div class="ptr" id="home-ptr"><i class="ti ti-refresh spin-dark"></i> <span id="home-ptr-text">Refreshing…</span></div>
                 <div id="h-tip-card" style="display:none;background:var(--green-l);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;font-size:13px;cursor:pointer" onclick="this.style.display='none'">💡 <b id="h-tip-title">New to FreshFlow?</b> <span id="h-tip-desc">Add your first item with the + button in Inventory, then explore Recipes that match your fridge. Tap here to dismiss.</span></div>
+                <!-- Proactive Food Alert Banner -->
+<div id="h-alert-banner" style="display:none;background:var(--red-l);color:var(--red);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;font-size:13px;font-weight:700;align-items:center;gap:8px;">
+  <span>⚠️</span> <span id="h-alert-banner-text">You have items expiring soon!</span>
+</div>
+
+<!-- Gamification Stats Widget -->
+<div class="card-sm" style="background:var(--amber-l);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--amber);">
+  <div style="font-size:13px;font-weight:700;color:#BF360C;">🔥 Streak: <span id="game-streak">1 day</span></div>
+  <div style="font-size:13px;font-weight:700;color:#BF360C;">⭐ Points: <span id="game-points">0 XP</span></div>
+</div>
                 <div class="fridge-card">
                     <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.6px;margin-bottom:12px" id="h-date"></div>
                     <div style="display:flex;align-items:center;gap:20px;margin-bottom:12px">
@@ -329,7 +339,14 @@
                 <div class="card" style="margin-bottom:14px"><div class="field"><label id="prof-lbl-house">Kitchen name</label><input class="inp" id="p-house" type="text" placeholder="My Kitchen"></div><div class="field"><label id="prof-lbl-name">Display name</label><input class="inp" id="p-name" type="text" placeholder="Alex"></div><div class="field"><label id="prof-lbl-avgprice">Average price per item (RM)</label><input class="inp" id="p-avg-price" type="number" step="0.01" min="0" placeholder="10"></div><button class="btn btn-sec" onclick="saveProfile()"><i class="ti ti-device-floppy"></i> <span id="prof-lbl-save">Save changes</span></button></div>
                 <div class="card" style="margin-bottom:14px"><button class="btn btn-sm" onclick="exportCSV(event)"><span id="prof-export-btn">📥 Export Inventory as CSV</span></button></div>
                 <div class="card" style="margin-bottom:14px"><div style="font-size:14px;font-weight:700;margin-bottom:12px" id="prof-lbl-theme">Theme Color</div><div class="theme-colors"><div class="theme-color-btn" data-theme="" style="background:#389C9A" onclick="setTheme('')"></div><div class="theme-color-btn" data-theme="ocean" style="background:#0077B6" onclick="setTheme('ocean')"></div><div class="theme-color-btn" data-theme="sunset" style="background:#E76F51" onclick="setTheme('sunset')"></div><div class="theme-color-btn" data-theme="forest" style="background:#2D6A4F" onclick="setTheme('forest')"></div><div class="theme-color-btn" data-theme="berry" style="background:#9B5DE5" onclick="setTheme('berry')"></div><div class="theme-color-btn" data-theme="mono" style="background:#4A4E69" onclick="setTheme('mono')"></div></div></div>
-                <div class="card" style="margin-bottom:14px"><div style="font-size:14px;font-weight:700;margin-bottom:12px" id="prof-lbl-cats">Categories</div><div id="prof-cats" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px"></div><div style="display:flex;gap:8px"><input class="inp" id="new-cat-inp" type="text" placeholder="Add category…" style="flex:1;padding:9px 12px;font-size:13px"><button onclick="addCategory()" style="background:var(--green);color:#fff;border:none;border-radius:var(--radius-xs);padding:0 14px;font-weight:700;cursor:pointer" id="prof-add-cat-btn">+ Add</button></div></div>
+                <!-- Gamification Badges Container -->
+<div class="card" style="margin-bottom:14px">
+  <div style="font-size:14px;font-weight:700;margin-bottom:12px;">🏆 My Achievements & Badges</div>
+  <div id="badges-list" style="display:flex;gap:10px;flex-wrap:wrap;">
+    <!-- Badges will be injected here automatically by JS -->
+  </div>
+</div>
+              <div class="card" style="margin-bottom:14px"><div style="font-size:14px;font-weight:700;margin-bottom:12px" id="prof-lbl-cats">Categories</div><div id="prof-cats" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px"></div><div style="display:flex;gap:8px"><input class="inp" id="new-cat-inp" type="text" placeholder="Add category…" style="flex:1;padding:9px 12px;font-size:13px"><button onclick="addCategory()" style="background:var(--green);color:#fff;border:none;border-radius:var(--radius-xs);padding:0 14px;font-weight:700;cursor:pointer" id="prof-add-cat-btn">+ Add</button></div></div>
                 <div class="card" style="margin-bottom:14px"><div class="setting-row" onclick="switchLang('en')"><div class="setting-left"><div class="setting-icon" style="background:var(--blue-l)">🇬🇧</div><div><div class="setting-label">English</div></div></div><i class="ti ti-check" id="lang-en-check" style="color:var(--green)"></i></div><div class="setting-row" onclick="switchLang('zh')"><div class="setting-left"><div class="setting-icon" style="background:var(--red-l)">🇨🇳</div><div><div class="setting-label">中文 (简体)</div></div></div><i class="ti ti-check" id="lang-zh-check" style="color:var(--green);display:none"></i></div><div class="setting-row" onclick="switchLang('ms')"><div class="setting-left"><div class="setting-icon" style="background:var(--green-l)">🇲🇾</div><div><div class="setting-label">Bahasa Melayu</div></div></div><i class="ti ti-check" id="lang-ms-check" style="color:var(--green);display:none"></i></div></div>
                 <div class="card" style="margin-bottom:14px"><div class="setting-row" onclick="toggleDark()"><div class="setting-left"><div class="setting-icon" style="background:var(--surface2)">🌙</div><div><div class="setting-label" id="prof-lbl-dark">Dark Mode</div></div></div><div class="toggle" id="dark-toggle"></div></div><div class="setting-row" onclick="confirmDeleteAccount()"><div class="setting-left"><div class="setting-icon" style="background:var(--red-l)">⚠️</div><div><div class="setting-label" id="prof-lbl-delacc" style="color:var(--red)">Delete Account</div></div></div><i class="ti ti-chevron-right" style="color:var(--text3)"></i></div></div>
                 <button class="btn btn-danger" onclick="doLogout()"><i class="ti ti-logout"></i> <span id="prof-lbl-logout">Sign out</span></button>
@@ -1623,7 +1640,133 @@ function doGoogleSignIn() {
   applyLang();
   go('v-auth');
   await loadSession();
+  
+  // RUN SYSTEM ENGINES NOW
+  initGamificationSystem();
+  checkProactiveFoodAlerts();
 })();
+    // ========================================================
+    // GAMIFICATION & PROACTIVE ALERT ENGINE 
+    // ========================================================
+    
+    // Core Game States saved locally to the user's device
+    const GAME_KEYS = { POINTS: 'ff-xp', STREAK: 'ff-streak', LAST_LOGIN: 'ff-last-login' };
+
+    // Initialize or read game metrics
+    let userPoints = parseInt(localStorage.getItem(GAME_KEYS.POINTS)) || 0;
+    let loginStreak = parseInt(localStorage.getItem(GAME_KEYS.STREAK)) || 1;
+
+    // 1. Proactive Alert Notification Logic
+    function checkProactiveFoodAlerts() {
+      const alertBanner = document.getElementById('h-alert-banner');
+      const alertText = document.getElementById('h-alert-banner-text');
+      if (!alertBanner) return;
+
+      // Filter active items expiring in 3 days or less
+      const urgentItems = fridgeItems.filter(i => !i.archived && daysUntil(i.expiry_date) >= 0 && daysUntil(i.expiry_date) <= 3);
+
+      if (urgentItems.length > 0) {
+        const itemWord = urgentItems.length === 1 ? 'item' : 'items';
+        
+        // Customize warning message based on selected language
+        if (LANG === 'zh') {
+          alertText.textContent = `注意！您有 ${urgentItems.length} 个食材即将过期，请尽快处理！`;
+        } else if (LANG === 'ms') {
+          alertText.textContent = `Amaran! Anda mempunyai ${urgentItems.length} bahan yang hampir luput!`;
+        } else {
+          alertText.textContent = `Warning! You have ${urgentItems.length} ${itemWord} expiring within 3 days!`;
+        }
+        
+        alertBanner.style.display = 'flex';
+      } else {
+        alertBanner.style.display = 'none';
+      }
+    }
+
+    // 2. Gamification Streak & Points Mechanics
+    function initGamificationSystem() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const lastLogin = localStorage.getItem(GAME_KEYS.LAST_LOGIN);
+
+      if (lastLogin) {
+        const daysDiff = Math.round((new Date(todayStr) - new Date(lastLogin)) / 86400000);
+        
+        if (daysDiff === 1) {
+          // Logged in consecutive day! Advance streak
+          loginStreak += 1;
+          localStorage.setItem(GAME_KEYS.STREAK, loginStreak);
+          rewardPoints(20, "Daily login streak bonus!");
+        } else if (daysDiff > 1) {
+          // Broke the streak, reset to day 1
+          loginStreak = 1;
+          localStorage.setItem(GAME_KEYS.STREAK, loginStreak);
+        }
+      }
+      
+      localStorage.setItem(GAME_KEYS.LAST_LOGIN, todayStr);
+      renderGamificationUI();
+    }
+
+    function rewardPoints(amount, reason) {
+      userPoints += amount;
+      localStorage.setItem(GAME_KEYS.POINTS, userPoints);
+      showToast(`⭐ +${amount} XP: ${reason}`);
+      renderGamificationUI();
+    }
+
+    function renderGamificationUI() {
+      // Update stats displays across screens
+      const streakEl = document.getElementById('game-streak');
+      const pointsEl = document.getElementById('game-points');
+      
+      if (streakEl) streakEl.textContent = `${loginStreak} ${loginStreak === 1 ? 'day' : 'days'}`;
+      if (pointsEl) pointsEl.textContent = `${userPoints} XP`;
+
+      // Render unlocked accomplishment badges inside profile view
+      const badgesContainer = document.getElementById('badges-list');
+      if (!badgesContainer) return;
+
+      const totalItemsTracked = fridgeItems.length;
+      const consumedCount = fridgeItems.filter(i => i.archived).length;
+
+      const badgeRules = [
+        { name: "🌱 Fresh Start", desc: "Added your first food item", unlocked: totalItemsTracked >= 1 },
+        { name: "🔥 Dedicated Cook", desc: "Achieved a 3+ day streak", unlocked: loginStreak >= 3 },
+        { name: "🛡️ Waste Warrior", desc: "Consumed an item completely", unlocked: consumedCount >= 1 },
+        { name: "👑 Master Chef", desc: "Accumulated 100+ XP points", unlocked: userPoints >= 100 }
+      ];
+
+      badgesContainer.innerHTML = badgeRules.map(badge => {
+        const opacity = badge.unlocked ? '1' : '0.35';
+        const bg = badge.unlocked ? 'var(--green-l)' : 'var(--surface2)';
+        const textColor = badge.unlocked ? 'var(--green-d)' : 'var(--text3)';
+        return `
+          <div style="background:${bg}; color:${textColor}; opacity:${opacity}; padding:10px; border-radius:var(--radius-sm); font-size:12px; font-weight:700; min-width:130px; text-align:center; border: 1px solid var(--border)">
+            <div>${badge.name}</div>
+            <div style="font-size:9px; font-weight:normal; margin-top:2px;">${badge.desc}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Connect points system to pre-existing actions inside your code structure
+    // Hook into item creation inside saveItem()
+    const originalSaveItem = window.saveItem;
+    window.saveItem = async function() {
+      const isNewItem = !editItemId; 
+      await originalSaveItem();
+      if (isNewItem) {
+        rewardPoints(10, "Added raw ingredient to fridge");
+      }
+    };
+
+    // Hook into consumption inside archiveItem()
+    const originalArchiveItem = window.archiveItem;
+    window.archiveItem = async function() {
+      await originalArchiveItem();
+      rewardPoints(30, "Saved food from being wasted!");
+      confetti(); // Trigger reward animation
+    };
     </script>
 </body>
 </html>
