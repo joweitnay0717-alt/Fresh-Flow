@@ -1153,81 +1153,184 @@ function doGoogleSignIn() {
     function stopBarcodeScanner() { if (html5QrCode) { html5QrCode.stop().then(() => { html5QrCode = null; }).catch(()=>{}); } }
     function closeBarcodeScanner() { stopBarcodeScanner(); closeModal('m-barcode'); }
   // Function to handle the scanned barcode
-async function lookupBarcode(code) {
-  try {
-    console.log(`Scanning barcode: ${code}...`);
+// ========================================================
+    // 1. MALAYSIAN MEGA DICTIONARY & AUTO-DETECTOR SYSTEM
+    // ========================================================
+    const commonFoods = [
+      // --- PROTEIN & MEAT ---
+      "Chicken / Ayam / 鸡肉", "Beef / Daging Lembu / 牛肉", "Mutton / Daging Kambing / 羊肉", 
+      "Pork / Daging Babi / 猪肉", "Egg / Telur / 鸡蛋", "Duck / Itik / 鸭肉",
+      
+      // --- SEAFOOD ---
+      "Fish / Ikan / 鱼", "Prawn / Udang / 虾", "Squid / Sotong / 苏东", 
+      "Crab / Ketam / 螃蟹", "Anchovies / Ikan Bilis / 江鱼仔", "Cockles / Kerang / 鲜蛤",
 
-    // 1. First, check the global Open Food Facts API
-    const offUrl = `https://world.openfoodfacts.org/api/v0/product/${code}.json`;
-    const response = await fetch(offUrl);
-    const data = await response.json();
+      // --- CARBS & NOODLES ---
+      "White Rice / Nasi Putih / 白饭", "Yellow Noodles / Mee Kuning / 黄面", 
+      "Rice Vermicelli / Bihun / 米粉", "Flat Rice Noodles / Kuey Teow / 粿条", 
+      "Bread / Roti / 面包", "Instant Noodles / Maggi / 快熟面", 
+      "Kolo Mee / Kolo Mee / 哥罗面", "Sarawak Laksa / Laksa Sarawak / 砂拉越叻沙",
 
-    if (data.status === 1 && data.product && data.product.product_name) {
-      // Success! Found in the global database
-      displayResult(data.product.product_name, code);
-      return; // Exit the function early
+      // --- VEGETABLES ---
+      "Cabbage / Kubis / 包菜", "Water Spinach / Kangkung / 空心菜", 
+      "Spinach / Bayam / 菠菜", "Bean Sprouts / Taugeh / 豆芽", 
+      "Eggplant / Terung / 茄子", "Bitter Gourd / Peria / 苦瓜", 
+      "Long Beans / Kacang Panjang / 长豆", "Lady's Finger / Bendi / 秋葵", 
+      "Midin / Midin / 米林", "Paku / Pucuk Paku / 巴菇菜", 
+      "Carrot / Lobak Merah / 红萝卜", "Potato / Ubi Kentang / 马铃薯",
+      "Sweet Potato / Ubi Keledek / 番薯", "Tapioca / Ubi Kayu / 木薯",
+
+      // --- AROMATICS & SPICES ---
+      "Garlic / Bawang Putih / 蒜头", "Red Onion / Bawang Merah / 红葱头", 
+      "Big Onion / Bawang Besar / 洋葱", "Ginger / Halia / 姜", 
+      "Lemongrass / Serai / 香茅", "Galangal / Lengkuas / 南姜", 
+      "Turmeric / Kunyit / 黄姜", "Chili / Cili / 辣椒", 
+      "Dried Chili / Cili Kering / 辣椒干", "Curry Leaves / Daun Kari / 咖喱叶", 
+      "Pandan Leaves / Daun Pandan / 班兰叶", "Coriander / Ketumbar / 香菜",
+
+      // --- CONDIMENTS & SAUCES ---
+      "Soy Sauce / Kicap Masin / 酱油 (生抽)", "Dark Soy Sauce / Kicap Pekat / 黑酱油 (老抽)", 
+      "Sweet Soy Sauce / Kicap Manis / 甜酱油", "Oyster Sauce / Sos Tiram / 蚝油", 
+      "Chili Sauce / Sos Cili / 辣椒酱", "Tomato Sauce / Sos Tomato / 番茄酱", 
+      "Shrimp Paste / Belacan / 峇拉煎", "Cincalok / Cincalok / 虾酱", 
+      "Coconut Milk / Santan / 椰奶", "Cooking Oil / Minyak Masak / 食用油", 
+      "Sesame Oil / Minyak Bijan / 芝麻油", "Salt / Garam / 盐", "Sugar / Gula / 糖",
+
+      // --- DRINKS & DAIRY ---
+      "Condensed Milk / Susu Pekat / 炼奶", "Evaporated Milk / Susu Cair / 淡奶", 
+      "Fresh Milk / Susu Segar / 鲜奶", "Milo / Milo / 美禄", 
+      "Coffee Powder / Serbuk Kopi / 咖啡粉", "Tea Dust / Serbuk Teh / 茶粉",
+
+      // --- FRUITS ---
+      "Banana / Pisang / 香蕉", "Papaya / Betik / 木瓜", "Watermelon / Tembikai / 西瓜", 
+      "Pineapple / Nanas / 黄梨", "Mango / Mangga / 芒果", "Durian / Durian / 榴莲", 
+      "Rambutan / Rambutan / 红毛丹", "Mangosteen / Manggis / 山竹"
+    ];
+
+    let customDatabaseFoods = [];
+
+    // Fetches custom foods scanned into your Supabase table to expand the dictionary
+    async function loadCustomDatabaseSuggestions() {
+      try {
+        const { data, error } = await SB.from('malaysian_products').select('product_name');
+        if (!error && data) {
+          customDatabaseFoods = data.map(item => item.product_name);
+        }
+      } catch (e) {
+        console.error("Failed to sync custom dictionary items:", e);
+      }
+    }
+    loadCustomDatabaseSuggestions();
+
+    // Activates the custom drop-down menu when typing in the input field
+    window.showSuggestions = function(value) {
+      const suggestionsContainer = document.getElementById('suggestions');
+      if (!suggestionsContainer) return;
+      
+      const inputVal = value.toLowerCase().trim();
+      if (!inputVal) {
+        suggestionsContainer.style.display = 'none';
+        return;
+      }
+
+      // Combine default items and crowdsourced items, removing duplicates
+      const masterList = [...new Set([...commonFoods, ...customDatabaseFoods])];
+      const filtered = masterList.filter(food => food.toLowerCase().includes(inputVal));
+
+      if (filtered.length === 0) {
+        suggestionsContainer.style.display = 'none';
+        return;
+      }
+
+      // Generate the custom suggestion dropdown entries
+      suggestionsContainer.innerHTML = filtered.map(food => {
+        return `<div onclick="selectSuggestion('${food.replace(/'/g, "\\'")}')">${food}</div>`;
+      }).join('');
+      
+      suggestionsContainer.style.display = 'block';
     }
 
-    // 2. If not found globally, check your custom Supabase table for local Malaysian items
-    console.log("Not found globally. Checking local Supabase database...");
-    
-    const { data: localData, error: fetchError } = await _supabase
-      .from('malaysian_products')
-      .select('product_name')
-      .eq('barcode', code)
-      .single();
+    // Handles what happens when a user taps an item from the dropdown list
+    window.selectSuggestion = function(foodName) {
+      const inputField = document.getElementById('it-name');
+      if (inputField) inputField.value = foodName;
+      document.getElementById('suggestions').style.display = 'none';
+    };
 
-    if (localData && localData.product_name) {
-      // Success! Someone already crowdsourced this local item
-      displayResult(`${localData.product_name} (Local Data)`, code);
-      return; 
+
+    // ========================================================
+    // 2. FIXED BARCODE LOOKUP SYSTEM (Replaces old functions)
+    // ========================================================
+    async function lookupBarcode(code) {
+      try {
+        console.log(`Scanning barcode: ${code}...`);
+
+        // 1. Check global Open Food Facts API
+        const offUrl = `https://world.openfoodfacts.org/api/v0/product/${code}.json`;
+        const response = await fetch(offUrl);
+        const data = await response.json();
+
+        if (data.status === 1 && data.product && data.product.product_name) {
+          displayResult(data.product.product_name, code);
+          return;
+        }
+
+        // 2. Check local database table (FIXED: Uses SB instead of _supabase)
+        console.log("Not found globally. Checking local Supabase database...");
+        const { data: localData, error: fetchError } = await SB
+          .from('malaysian_products')
+          .select('product_name')
+          .eq('barcode', code)
+          .single();
+
+        if (localData && localData.product_name) {
+          displayResult(`${localData.product_name} (Local Data)`, code);
+          return; 
+        }
+
+        // 3. Prompt user to crowdsource it if not found anywhere
+        promptUserToAddNewProduct(code);
+
+      } catch (error) {
+        alert(`The real error is: ${error.message}`);
+      }
     }
 
-    // 3. If it's not in EITHER database, prompt the user to add it!
-    promptUserToAddNewProduct(code);
+    async function promptUserToAddNewProduct(code) {
+      const newProductName = prompt(`Barcode ${code} not found!\n\nPlease enter the name of this local product to save it for everyone:`);
 
-} catch (error) {
-    // This will force the app to pop up the EXACT technical reason it failed
-    alert(`The real error is: ${error.message}`);
-  }
-}
+      if (newProductName && newProductName.trim() !== "") {
+        // FIXED: Uses SB instead of _supabase
+        const { error: insertError } = await SB
+          .from('malaysian_products')
+          .insert([
+            { barcode: code, product_name: newProductName.trim() }
+          ]);
 
-// Helper function to handle saving new crowdsourced items
-async function promptUserToAddNewProduct(code) {
-  // Pop up an alert asking the user for the product name (e.g., a specific Sarawakian noodle brand)
-  const newProductName = prompt(`Barcode ${code} not found!\n\nPlease enter the name of this local product to save it for everyone:`);
-
-  // If the user typed something and didn't hit cancel
-  if (newProductName && newProductName.trim() !== "") {
-    
-    // Insert it into Supabase
-    const { error: insertError } = await _supabase
-      .from('malaysian_products')
-      .insert([
-        { barcode: code, product_name: newProductName.trim() }
-      ]);
-
-    if (insertError) {
-      console.error("Failed to save to Supabase:", insertError);
-      alert("Oops! Failed to save the product to the database. Check the console.");
-    } else {
-      // Successfully saved!
-      alert(`Awesome! "${newProductName.trim()}" has been added to our local database.`);
-      displayResult(`${newProductName.trim()} (New Local)`, code);
+        if (insertError) {
+          console.error("Failed to save to Supabase:", insertError);
+          alert(`Oops! Failed to save. Error: ${insertError.message}`);
+        } else {
+          alert(`Awesome! "${newProductName.trim()}" has been added to our local database.`);
+          displayResult(`${newProductName.trim()} (New Local)`, code);
+          loadCustomDatabaseSuggestions(); // Refresh list immediately
+        }
+      }
     }
-  } else {
-    // User hit cancel or left it blank
-    console.log("User cancelled adding a new product.");
-  }
-}
 
-// Function to update the UI (Make sure you have an HTML element with id="result")
-function displayResult(productName, barcode) {
-  document.getElementById('result').innerHTML = `
-    <strong>Product Found:</strong> ${productName} <br>
-    <small>Barcode: ${barcode}</small>
-  `;
-}
+    // FIXED: Maps your text directly to the input box ("it-name") and barcode block
+    function displayResult(productName, barcode) {
+      const resContainer = document.getElementById('barcode-result');
+      const nameInput = document.getElementById('it-name');
+      
+      if (resContainer) {
+        resContainer.innerHTML = `<strong>Product Found:</strong> ${productName} <br><small>Barcode: ${barcode}</small>`;
+        resContainer.style.display = 'block';
+      }
+      if (nameInput) {
+        nameInput.value = productName;
+      }
+    }
 
     function renderCuisineFilter() {
         const cuisines = ['All', ...new Set(RECIPES.map(r => r.cuisine))];
