@@ -1836,8 +1836,8 @@ function doGoogleSignIn() {
       confetti(); // Trigger reward animation
     };
 
-    // ========================================================
-    // COMBINED NOTIFICATION AND REAL-PHONE ALERT ENGINE
+  // ========================================================
+    // IN-APP ALERT ENGINE (Native Push is handled by Supabase)
     // ========================================================
     async function checkProactiveFoodAlerts() {
       const alertBanner = document.getElementById('h-alert-banner');
@@ -1845,7 +1845,7 @@ function doGoogleSignIn() {
       
       const urgentItems = fridgeItems.filter(i => !i.archived && daysUntil(i.expiry_date) >= 0 && daysUntil(i.expiry_date) <= 3);
 
-      // Task 1: Render the Inside-App Banner layout card instantly
+      // Render the Inside-App Banner layout card instantly
       if (urgentItems.length > 0 && alertBanner && alertText) {
         if (LANG === 'zh') {
           alertText.textContent = `注意！您有 ${urgentItems.length} 个食材即将过期，请尽快处理！`;
@@ -1858,9 +1858,8 @@ function doGoogleSignIn() {
         alertBanner.style.display = 'flex';
       } else if (alertBanner) {
         alertBanner.style.display = 'none';
-        return; 
       }
-
+    }
       // Task 2: Push a hard notification directly to the native phone lock screen tray
       if (Notification.permission === 'default') {
         await Notification.requestPermission();
