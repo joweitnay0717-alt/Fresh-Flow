@@ -1836,7 +1836,7 @@ function doGoogleSignIn() {
       confetti(); // Trigger reward animation
     };
 
-  // ========================================================
+ // ========================================================
     // IN-APP ALERT ENGINE (Native Push is handled by Supabase)
     // ========================================================
     async function checkProactiveFoodAlerts() {
@@ -1845,7 +1845,7 @@ function doGoogleSignIn() {
       
       const urgentItems = fridgeItems.filter(i => !i.archived && daysUntil(i.expiry_date) >= 0 && daysUntil(i.expiry_date) <= 3);
 
-      // Render the Inside-App Banner layout card instantly
+      // 1. Render the Inside-App Banner layout
       if (urgentItems.length > 0 && alertBanner && alertText) {
         if (LANG === 'zh') {
           alertText.textContent = `注意！您有 ${urgentItems.length} 个食材即将过期，请尽快处理！`;
@@ -1859,28 +1859,16 @@ function doGoogleSignIn() {
       } else if (alertBanner) {
         alertBanner.style.display = 'none';
       }
-    }
-      // Task 2: Push a hard notification directly to the native phone lock screen tray
-      if (Notification.permission === 'default') {
-        await Notification.requestPermission();
-      }
 
-      if (Notification.permission === 'granted' && navigator.serviceWorker.controller) {
-        // Extract up to 3 item names for the notification
+      // 2. Only fire the notification if the app is NOT being used (optional)
+      // If you still want the app to trigger a notification when it's open, 
+      // you can keep this code. If you ONLY want the server to do it, delete this block.
+      if (urgentItems.length > 0 && Notification.permission === 'granted' && navigator.serviceWorker.controller) {
         const itemNames = urgentItems.slice(0, 3).map(i => localizeIngredientName(i.name)).join(', ');
-        const moreCount = urgentItems.length > 3 ? ` +${urgentItems.length - 3} more` : '';
-        const foodListString = `${itemNames}${moreCount}`;
+        const foodListString = `${itemNames}${urgentItems.length > 3 ? '...' : ''}`;
 
         let title = "FreshFlow Alert! ⚠️";
-        let body = `Expiring soon: ${foodListString}. Cook them today!`;
-
-        if (LANG === 'zh') {
-          title = "FreshFlow 临期提醒! ⚠️";
-          body = `即将过期: ${foodListString}。记得及时烹饪哦！`;
-        } else if (LANG === 'ms') {
-          title = "Amaran FreshFlow! ⚠️";
-          body = `Hampir luput: ${foodListString}. Jangan buang!`;
-        }
+        let body = `Expiring soon: ${foodListString}.`;
 
         navigator.serviceWorker.controller.postMessage({
           type: 'SHOW_NOTIFICATION',
