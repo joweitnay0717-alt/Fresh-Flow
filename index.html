@@ -774,13 +774,19 @@
     function extractItemName(ingredientStr) { return simplifyName(ingredientStr).join(' '); }
     function getMissingIngredients(r, items) { const fridgeTokens = items.flatMap(i => simplifyName(i.name)); return r.ing.en.filter(ing => { const tokens = simplifyName(ing); return !tokens.every(t => fridgeTokens.includes(t)); }); }
 
-    function go(viewId) {
+   function go(viewId, fromHistory = false) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById(viewId).classList.add('active');
         currentView = viewId;
         const nav = document.getElementById('bottom-nav');
         nav.style.display = ['v-auth','v-recdet'].includes(viewId) ? 'none' : 'flex';
         document.querySelectorAll('.nav-item').forEach(ni => ni.classList.toggle('active', ni.dataset.v === viewId));
+        
+        // Push state to browser history if this wasn't triggered by a back swipe
+        if (!fromHistory) {
+            window.history.pushState({ view: viewId }, '', `#${viewId}`);
+        }
+
         if (viewId === 'v-home') renderHome();
         else if (viewId === 'v-inv') { renderInvCatScroll(); renderInv(); }
         else if (viewId === 'v-recipe') { renderCuisineFilter(); renderRecipes(); }
@@ -790,6 +796,15 @@
         else if (viewId === 'v-profile') renderProfile();
         else if (viewId === 'v-favorites') renderFavorites();
     }
+
+    // This tells the phone what to do when you swipe back
+    window.addEventListener('popstate', (event) => {
+        if (event.state && event.state.view) {
+            go(event.state.view, true); 
+        } else {
+            go('v-home', true);
+        }
+    });
 
     function showToast(msg, ms=2200) { toastQueue.push({msg, ms}); if (!toastShowing) processToastQueue(); }
     function processToastQueue() { if (toastQueue.length===0) { toastShowing=false; return; } toastShowing=true; const {msg, ms} = toastQueue.shift(); const t = document.getElementById('toast'); t.textContent = msg; t.style.display='block'; clearTimeout(t._t); t._t = setTimeout(() => { t.style.display='none'; processToastQueue(); }, ms); }
@@ -1779,7 +1794,7 @@ function doGoogleSignIn() {
       confetti(); // Trigger reward animation
     };
 
-      // ========================================================
+    // ========================================================
     // COMBINED NOTIFICATION AND REAL-PHONE ALERT ENGINE
     // ========================================================
     async function checkProactiveFoodAlerts() {
@@ -1810,15 +1825,20 @@ function doGoogleSignIn() {
       }
 
       if (Notification.permission === 'granted' && navigator.serviceWorker.controller) {
+        // Extract up to 3 item names for the notification
+        const itemNames = urgentItems.slice(0, 3).map(i => localizeIngredientName(i.name)).join(', ');
+        const moreCount = urgentItems.length > 3 ? ` +${urgentItems.length - 3} more` : '';
+        const foodListString = `${itemNames}${moreCount}`;
+
         let title = "FreshFlow Alert! ⚠️";
-        let body = `You have ${urgentItems.length} items expiring soon. Don't let them go to waste!`;
+        let body = `Expiring soon: ${foodListString}. Cook them today!`;
 
         if (LANG === 'zh') {
           title = "FreshFlow 临期提醒! ⚠️";
-          body = `您有 ${urgentItems.length} 个食材即将过期，记得及时烹饪哦！`;
+          body = `即将过期: ${foodListString}。记得及时烹饪哦！`;
         } else if (LANG === 'ms') {
           title = "Amaran FreshFlow! ⚠️";
-          body = `Anda mempunyai ${urgentItems.length} bahan yang hampir luput!`;
+          body = `Hampir luput: ${foodListString}. Jangan buang!`;
         }
 
         navigator.serviceWorker.controller.postMessage({
