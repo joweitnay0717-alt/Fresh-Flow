@@ -348,7 +348,13 @@
 </div>
               <div class="card" style="margin-bottom:14px"><div style="font-size:14px;font-weight:700;margin-bottom:12px" id="prof-lbl-cats">Categories</div><div id="prof-cats" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px"></div><div style="display:flex;gap:8px"><input class="inp" id="new-cat-inp" type="text" placeholder="Add category…" style="flex:1;padding:9px 12px;font-size:13px"><button onclick="addCategory()" style="background:var(--green);color:#fff;border:none;border-radius:var(--radius-xs);padding:0 14px;font-weight:700;cursor:pointer" id="prof-add-cat-btn">+ Add</button></div></div>
                 <div class="card" style="margin-bottom:14px"><div class="setting-row" onclick="switchLang('en')"><div class="setting-left"><div class="setting-icon" style="background:var(--blue-l)">🇬🇧</div><div><div class="setting-label">English</div></div></div><i class="ti ti-check" id="lang-en-check" style="color:var(--green)"></i></div><div class="setting-row" onclick="switchLang('zh')"><div class="setting-left"><div class="setting-icon" style="background:var(--red-l)">🇨🇳</div><div><div class="setting-label">中文 (简体)</div></div></div><i class="ti ti-check" id="lang-zh-check" style="color:var(--green);display:none"></i></div><div class="setting-row" onclick="switchLang('ms')"><div class="setting-left"><div class="setting-icon" style="background:var(--green-l)">🇲🇾</div><div><div class="setting-label">Bahasa Melayu</div></div></div><i class="ti ti-check" id="lang-ms-check" style="color:var(--green);display:none"></i></div></div>
-                <div class="card" style="margin-bottom:14px"><div class="setting-row" onclick="toggleDark()"><div class="setting-left"><div class="setting-icon" style="background:var(--surface2)">🌙</div><div><div class="setting-label" id="prof-lbl-dark">Dark Mode</div></div></div><div class="toggle" id="dark-toggle"></div></div><div class="setting-row" onclick="confirmDeleteAccount()"><div class="setting-left"><div class="setting-icon" style="background:var(--red-l)">⚠️</div><div><div class="setting-label" id="prof-lbl-delacc" style="color:var(--red)">Delete Account</div></div></div><i class="ti ti-chevron-right" style="color:var(--text3)"></i></div></div>
+                <div class="card" style="margin-bottom:14px"><div class="setting-row" onclick="requestPushPermission()">
+    <div class="setting-left">
+        <div class="setting-icon" style="background:var(--blue-l)">🔔</div>
+        <div><div class="setting-label">Enable Notifications</div></div>
+    </div>
+    <i class="ti ti-chevron-right" style="color:var(--text3)"></i>
+</div><div class="setting-row" onclick="toggleDark()"><div class="setting-left"><div class="setting-icon" style="background:var(--surface2)">🌙</div><div><div class="setting-label" id="prof-lbl-dark">Dark Mode</div></div></div><div class="toggle" id="dark-toggle"></div></div><div class="setting-row" onclick="confirmDeleteAccount()"><div class="setting-left"><div class="setting-icon" style="background:var(--red-l)">⚠️</div><div><div class="setting-label" id="prof-lbl-delacc" style="color:var(--red)">Delete Account</div></div></div><i class="ti ti-chevron-right" style="color:var(--text3)"></i></div></div>
                 <button class="btn btn-danger" onclick="doLogout()"><i class="ti ti-logout"></i> <span id="prof-lbl-logout">Sign out</span></button>
                 <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--text3)" id="prof-footer">FreshFlow v1.0 • Made with ❤️</div>
                 <div style="height:16px"></div>
@@ -844,7 +850,7 @@ function doGoogleSignIn() {
    // ========================================================
     // WEB PUSH NOTIFICATION SETUP
     // ========================================================
-    const PUBLIC_VAPID_KEY = '"BBCsXlV2a8XpS63hv2RT5iYlbR6A1gGAaCJOqWpvWloZY7572Qw4l4NN_UFeqnNvXeVvloyoV1M5QdEy1F3ImBM",';
+    const PUBLIC_VAPID_KEY = 'BBCsXlV2a8XpS63hv2RT5iYlbR6A1gGAaCJOqWpvWloZY7572Qw4l4NN_UFeqnNvXeVvloyoV1M5QdEy1F3ImBM';
 
     // Helper to convert the key format
     function urlBase64ToUint8Array(base64String) {
@@ -877,6 +883,26 @@ function doGoogleSignIn() {
         console.log("Push notifications subscribed successfully!");
       } catch (error) {
         console.error("Failed to subscribe to push:", error);
+      }
+    }
+      async function requestPushPermission() {
+      // 1. Check if the browser even supports notifications
+      if (!('Notification' in window)) {
+        showToast("Notifications not supported on this browser.");
+        return;
+      }
+
+      // 2. Ask the user for permission (This triggers the phone's pop-up!)
+      const permission = await Notification.requestPermission();
+      
+      // 3. If they say yes, subscribe them to the background server
+      if (permission === 'granted') {
+        showToast("Notifications enabled!");
+        if (currentUser) {
+          subscribeToPushNotifications(currentUser.id);
+        }
+      } else {
+        showToast("Permission denied. Check your phone settings.");
       }
     }
       async function handleUser(user) {
