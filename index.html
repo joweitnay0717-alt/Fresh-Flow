@@ -390,7 +390,19 @@
     <div class="modal-bg" id="m-avatar"><div class="sheet"><div class="drag-handle"></div><div class="sheet-title" id="avatar-title">Choose Food Avatar</div><div id="avatar-emoji-grid" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;font-size:40px;padding:10px"></div><button style="width:100%;background:none;border:none;color:var(--text3);font-size:14px;padding:12px;cursor:pointer;margin-top:8px" onclick="closeModal('m-avatar')" id="avatar-cancel">Cancel</button></div></div>
     <div id="toast"></div>
     <div class="confetti-container" id="confetti-container"></div>
-
+<!-- AUTO NOTIFICATION PROMPT -->
+    <div class="dialog-bg" id="m-push-prompt">
+        <div class="dialog" style="text-align:center">
+            <div style="font-size:48px;margin-bottom:12px">🔔</div>
+            <h3 style="font-size:19px;margin-bottom:8px">Turn on Notifications?</h3>
+            <p style="font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.5">Get alerted when your food is about to expire so you never waste groceries again.</p>
+            <div class="dialog-btns">
+                <button class="btn btn-sec" onclick="closePushPrompt()">Not Now</button>
+                <button class="btn" style="background:var(--green);color:#fff" onclick="acceptPushPrompt()">Allow</button>
+            </div>
+        </div>
+    </div>
+  
     <script>
     'use strict';
     const CONFIG = {
@@ -884,6 +896,39 @@ function doGoogleSignIn() {
       } catch (error) {
         console.error("Failed to subscribe to push:", error);
       }
+    }
+      function triggerAutoPushPrompt() {
+        // If the browser supports notifications and we haven't asked them yet
+        if ('Notification' in window && Notification.permission === 'default') {
+            // Check if we already asked them in the past to avoid annoying them
+            if (!localStorage.getItem('ff-asked-push')) {
+                setTimeout(() => {
+                    document.getElementById('m-push-prompt').classList.add('open');
+                }, 2500); // Pops up automatically 2.5 seconds after loading the home screen!
+            }
+        } else if ('Notification' in window && Notification.permission === 'granted') {
+             // If they already granted it in the past, just quietly subscribe them to the server
+             if (currentUser) subscribeToPushNotifications(currentUser.id);
+        }
+    }
+
+    function closePushPrompt() {
+        localStorage.setItem('ff-asked-push', 'true'); // Remember that we asked
+        document.getElementById('m-push-prompt').classList.remove('open');
+    }
+
+    async function acceptPushPrompt() {
+        closePushPrompt(); // Close our custom pop-up
+        
+        // This triggers the OFFICIAL Apple/Google pop-up! 
+        // It is allowed now because the user just tapped our button.
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            showToast("Notifications enabled!");
+            if (currentUser) {
+                subscribeToPushNotifications(currentUser.id);
+            }
+        }
     }
       async function requestPushPermission() {
       // 1. Check if the browser even supports notifications
