@@ -984,6 +984,11 @@ function doGoogleSignIn() {
         if (Notification.permission === 'granted') {
             subscribeToPushNotifications(user.id);
         }
+       go('v-home');
+
+        // Check if we need to show the automatic Notification pop-up
+        triggerAutoPushPrompt();
+
         // Kicks off both system and internal app alerts after database info drops in cleanly
         setTimeout(() => {
             checkProactiveFoodAlerts();
