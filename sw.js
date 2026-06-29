@@ -31,17 +31,17 @@ self.addEventListener('notificationclick', function(event) {
   event.notification.close(); // Close the notification popup
   
   event.waitUntil(
-    clients.matchAll({ type: 'window' }).then(windowClients => {
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
       // Check if the app is already open in a background tab and focus it
       for (let i = 0; i < windowClients.length; i++) {
         let client = windowClients[i];
-        if (client.url.includes('/') && 'focus' in client) {
+        if (client.url === self.registration.scope && 'focus' in client) {
           return client.focus();
         }
       }
-      // If the app is fully closed, launch it
+      // If fully closed, launch the correct GitHub Pages URL
       if (clients.openWindow) {
-        return clients.openWindow('/'); 
+        return clients.openWindow(self.registration.scope); 
       }
     })
   );
