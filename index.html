@@ -355,7 +355,10 @@
     </div>
     <i class="ti ti-chevron-right" style="color:var(--text3)"></i>
 </div><div class="setting-row" onclick="toggleDark()"><div class="setting-left"><div class="setting-icon" style="background:var(--surface2)">🌙</div><div><div class="setting-label" id="prof-lbl-dark">Dark Mode</div></div></div><div class="toggle" id="dark-toggle"></div></div><div class="setting-row" onclick="confirmDeleteAccount()"><div class="setting-left"><div class="setting-icon" style="background:var(--red-l)">⚠️</div><div><div class="setting-label" id="prof-lbl-delacc" style="color:var(--red)">Delete Account</div></div></div><i class="ti ti-chevron-right" style="color:var(--text3)"></i></div></div>
-                <button class="btn btn-danger" onclick="doLogout()"><i class="ti ti-logout"></i> <span id="prof-lbl-logout">Sign out</span></button>
+               <button class="btn btn-sec" style="margin-bottom: 14px;" onclick="testServerPush()">
+   🚀 Test Server Push
+</button>
+              <button class="btn btn-danger" onclick="doLogout()"><i class="ti ti-logout"></i> <span id="prof-lbl-logout">Sign out</span></button>
                 <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--text3)" id="prof-footer">FreshFlow v1.0 • Made with ❤️</div>
                 <div style="height:16px"></div>
             </div>
@@ -1941,6 +1944,22 @@ function doGoogleSignIn() {
       
       // I HAVE COMPLETELY DELETED THE NOTIFICATION TRIGGER FROM HERE.
       // THE APP WILL NEVER RING YOUR PHONE AGAIN WHEN OPENED.
+    }
+      async function testServerPush() {
+        showToast("Asking server to send push...");
+        
+        // This tells your Supabase client to trigger the Edge Function manually!
+        const { data, error } = await SB.functions.invoke('push-alerts', {
+            method: 'POST',
+        });
+
+        if (error) {
+            showToast("Error: Check console");
+            console.error("Function Error:", error);
+        } else {
+            showToast("Server replied: Check your lock screen!");
+            console.log("Server Response:", data);
+        }
     }
     </script>
 </body>
