@@ -1915,13 +1915,16 @@ function doGoogleSignIn() {
  // ========================================================
     // IN-APP ALERT ENGINE (Native Push is handled by Supabase)
     // ========================================================
+  // ========================================================
+    // IN-APP ALERT ENGINE (Native Push is handled by Supabase)
+    // ========================================================
     async function checkProactiveFoodAlerts() {
       const alertBanner = document.getElementById('h-alert-banner');
       const alertText = document.getElementById('h-alert-banner-text');
       
       const urgentItems = fridgeItems.filter(i => !i.archived && daysUntil(i.expiry_date) >= 0 && daysUntil(i.expiry_date) <= 3);
 
-      // 1. Render the Inside-App Banner layout
+      // 1. Render the Inside-App Banner layout ONLY. No phone buzzing!
       if (urgentItems.length > 0 && alertBanner && alertText) {
         if (LANG === 'zh') {
           alertText.textContent = `注意！您有 ${urgentItems.length} 个食材即将过期，请尽快处理！`;
@@ -1935,23 +1938,9 @@ function doGoogleSignIn() {
       } else if (alertBanner) {
         alertBanner.style.display = 'none';
       }
-
-      // 2. Only fire the notification if the app is NOT being used (optional)
-      // If you still want the app to trigger a notification when it's open, 
-      // you can keep this code. If you ONLY want the server to do it, delete this block.
-      if (urgentItems.length > 0 && Notification.permission === 'granted' && navigator.serviceWorker.controller) {
-        const itemNames = urgentItems.slice(0, 3).map(i => localizeIngredientName(i.name)).join(', ');
-        const foodListString = `${itemNames}${urgentItems.length > 3 ? '...' : ''}`;
-
-        let title = "FreshFlow Alert! ⚠️";
-        let body = `Expiring soon: ${foodListString}.`;
-
-        navigator.serviceWorker.controller.postMessage({
-          type: 'SHOW_NOTIFICATION',
-          title: title,
-          body: body
-        });
-      }
+      
+      // I HAVE COMPLETELY DELETED THE NOTIFICATION TRIGGER FROM HERE.
+      // THE APP WILL NEVER RING YOUR PHONE AGAIN WHEN OPENED.
     }
     </script>
 </body>
