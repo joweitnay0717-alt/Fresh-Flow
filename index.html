@@ -1940,34 +1940,7 @@ function doGoogleSignIn() {
       } else if (alertBanner) {
         alertBanner.style.display = 'none';
       }
-      
-      // I HAVE COMPLETELY DELETED THE NOTIFICATION TRIGGER FROM HERE.
-      // THE APP WILL NEVER RING YOUR PHONE AGAIN WHEN OPENED.
-    }
-     async function testServerPush() {
-        showToast("Asking server to send push...");
-        
-        try {
-            // Talk directly to the internet, bypassing the Supabase client
-            const response = await fetch('https://qzzmisvsmolojchkfcja.supabase.co/functions/v1/push-alerts', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY
-                }
-            });
-            
-            const responseText = await response.text();
-            
-            if (!response.ok) {
-                alert("SERVER REJECTED IT (Status " + response.status + "):\n" + responseText);
-            } else {
-                alert("SUCCESS! 🚀\n" + responseText);
-            }
-        } catch (err) {
-            alert("PHONE BLOCKED IT (Network Error):\n" + err.message);
-        }
-    }
+    
     </script>
 </body>
 </html>
