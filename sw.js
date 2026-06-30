@@ -1,48 +1,31 @@
-// 1. Handles REAL background pushes from your Supabase Server (App is closed)
+// This tells the phone what to do when a push signal arrives
 self.addEventListener('push', function(event) {
-  if (event.data) {
-    const data = event.data.json();
-    
-    event.waitUntil(
-      self.registration.showNotification(data.title, {
-        body: data.body,
-        icon: 'favicon.png', // Uses your beautiful leaf/chili icon!
-        badge: 'favicon.png',
-        vibrate: [200, 100, 200]
-      })
-    );
-  }
-});
+    let data = {};
+    if (event.data) {
+        data = event.data.json(); // Read the message from Supabase
+    }
 
-// 2. Handles local notification requests from your main app (App is open)
-self.addEventListener('message', function(event) {
-  if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
-    self.registration.showNotification(event.data.title, {
-      body: event.data.body,
-      icon: 'favicon.png', 
-      vibrate: [200, 100, 200],
-      badge: 'favicon.png'
-    });
-  }
-});
-
-// 3. Opens FreshFlow when the user taps the notification!
-self.addEventListener('notificationclick', function(event) {
-  event.notification.close(); // Close the notification popup
-  
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
-      // Check if the app is already open in a background tab and focus it
-      for (let i = 0; i < windowClients.length; i++) {
-        let client = windowClients[i];
-        if (client.url === self.registration.scope && 'focus' in client) {
-          return client.focus();
+    const title = data.title || "FreshFlow Alert! ⚠️";
+    const options = {
+        body: data.body || "You have items expiring soon!",
+        icon: "favicon.png", 
+        badge: "favicon.png",
+        vibrate: [200, 100, 200, 100, 200, 100, 200], // Makes the phone buzz
+        data: {
+            url: "https://joweitnay0717-alt.github.io/Fresh-Flow/" // Your app link
         }
-      }
-      // If fully closed, launch the correct GitHub Pages URL
-      if (clients.openWindow) {
-        return clients.openWindow(self.registration.scope); 
-      }
-    })
-  );
+    };
+
+    // This is the line that actually draws the notification on the lock screen!
+    event.waitUntil(
+        self.registration.showNotification(title, options)
+    );
+});
+
+// This tells the phone what to do when you tap the notification
+self.addEventListener('notificationclick', function(event) {
+    event.notification.close(); // Close the pop-up
+    event.waitUntil(
+        clients.openWindow(event.notification.data.url) // Open your app
+    );
 });
