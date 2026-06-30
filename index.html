@@ -1742,7 +1742,6 @@ function doGoogleSignIn() {
         document.getElementById('prof-cats').innerHTML = getCats().map(c => `<div class="chip">${c}<span onclick="removeCategory('${c}')" style="margin-left:5px;cursor:pointer">×</span></div>`).join('');
         document.getElementById('dark-toggle').classList.toggle('on', darkMode);
         document.querySelectorAll('.theme-color-btn').forEach(b => { b.classList.toggle('active', b.dataset.theme === currentTheme); });
-        applyLang();
     }
     async function saveProfile() { const household = document.getElementById('p-house').value.trim(); const displayName = document.getElementById('p-name').value.trim(); const avgPrice = parseFloat(document.getElementById('p-avg-price').value) || 10; if (!household) { showToast(t('kitchenName') + ' is required'); return; } const updates = { household, display_name: displayName, avg_item_price: avgPrice }; const { error } = await SB.from('profiles').update(updates).eq('id', currentUser.id); if (error) { showToast(t('failedSaveProfile')); console.error(error); } else { userProfile = { ...userProfile, ...updates }; renderProfile(); showToast(t('profileSaved')); } }
     async function addCategory() { const newCat = document.getElementById('new-cat-inp').value.trim(); if (!newCat) return; const cats = getCats(); if (cats.includes(newCat)) { showToast(t('categoryExists')); return; } const updatedCats = [...cats, newCat]; const { error } = await SB.from('profiles').update({ categories: updatedCats }).eq('id', currentUser.id); if (error) { showToast(t('failedAddCategory')); return; } userProfile.categories = updatedCats; document.getElementById('new-cat-inp').value = ''; renderProfile(); showToast(t('categoryAdded')); }
@@ -1947,18 +1946,15 @@ function doGoogleSignIn() {
     }
       async function testServerPush() {
         showToast("Asking server to send push...");
-        
-        // This tells your Supabase client to trigger the Edge Function manually!
-        const { data, error } = await SB.functions.invoke('push-alerts', {
-            method: 'POST',
-        });
-
-        if (error) {
-            showToast("Error: Check console");
-            console.error("Function Error:", error);
-        } else {
-            showToast("Server replied: Check your lock screen!");
-            console.log("Server Response:", data);
+        try {
+            const { data, error } = await SB.functions.invoke('push-alerts', { method: 'POST' });
+            if (error) {
+                alert("SERVER ERROR:\n" + error.message); 
+            } else {
+                alert("SUCCESS! Check your lock screen!");
+            }
+        } catch (err) {
+            alert("CRASH:\n" + err.message);
         }
     }
     </script>
