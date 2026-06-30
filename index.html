@@ -1944,17 +1944,28 @@ function doGoogleSignIn() {
       // I HAVE COMPLETELY DELETED THE NOTIFICATION TRIGGER FROM HERE.
       // THE APP WILL NEVER RING YOUR PHONE AGAIN WHEN OPENED.
     }
-      async function testServerPush() {
+     async function testServerPush() {
         showToast("Asking server to send push...");
+        
         try {
-            const { data, error } = await SB.functions.invoke('push-alerts', { method: 'POST' });
-            if (error) {
-                alert("SERVER ERROR:\n" + error.message); 
+            // Talk directly to the internet, bypassing the Supabase client
+            const response = await fetch('https://qzzmisvsmolojchkfcja.supabase.co/functions/v1/push-alerts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY
+                }
+            });
+            
+            const responseText = await response.text();
+            
+            if (!response.ok) {
+                alert("SERVER REJECTED IT (Status " + response.status + "):\n" + responseText);
             } else {
-                alert("SUCCESS! Check your lock screen!");
+                alert("SUCCESS! 🚀\n" + responseText);
             }
         } catch (err) {
-            alert("CRASH:\n" + err.message);
+            alert("PHONE BLOCKED IT (Network Error):\n" + err.message);
         }
     }
     </script>
