@@ -1926,7 +1926,7 @@ function doGoogleSignIn() {
       
       const urgentItems = fridgeItems.filter(i => !i.archived && daysUntil(i.expiry_date) >= 0 && daysUntil(i.expiry_date) <= 3);
 
-      // 1. Render the Inside-App Banner layout ONLY. No phone buzzing!
+    // 1. Render the Inside-App Banner layout ONLY. No phone buzzing!
       if (urgentItems.length > 0 && alertBanner && alertText) {
         if (LANG === 'zh') {
           alertText.textContent = `注意！您有 ${urgentItems.length} 个食材即将过期，请尽快处理！`;
@@ -1940,7 +1940,10 @@ function doGoogleSignIn() {
       } else if (alertBanner) {
         alertBanner.style.display = 'none';
       }
-}    
+    } // <--- THIS IS THE BRACKET THAT WAS MISSING!
+
     </script>
+</body>
+</html>
 </body>
 </html>
