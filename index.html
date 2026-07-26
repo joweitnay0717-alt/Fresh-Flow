@@ -355,9 +355,7 @@
     </div>
     <i class="ti ti-chevron-right" style="color:var(--text3)"></i>
 </div><div class="setting-row" onclick="toggleDark()"><div class="setting-left"><div class="setting-icon" style="background:var(--surface2)">🌙</div><div><div class="setting-label" id="prof-lbl-dark">Dark Mode</div></div></div><div class="toggle" id="dark-toggle"></div></div><div class="setting-row" onclick="confirmDeleteAccount()"><div class="setting-left"><div class="setting-icon" style="background:var(--red-l)">⚠️</div><div><div class="setting-label" id="prof-lbl-delacc" style="color:var(--red)">Delete Account</div></div></div><i class="ti ti-chevron-right" style="color:var(--text3)"></i></div></div>
-               <button class="btn btn-sec" style="margin-bottom: 14px;" onclick="testServerPush()">
-   🚀 Test Server Push
-</button>
+
               <button class="btn btn-danger" onclick="doLogout()"><i class="ti ti-logout"></i> <span id="prof-lbl-logout">Sign out</span></button>
                 <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--text3)" id="prof-footer">FreshFlow v1.0 • Made with ❤️</div>
                 <div style="height:16px"></div>
@@ -1307,8 +1305,56 @@ function doGoogleSignIn() {
     async function archiveItem() { await SB.from('items').update({ archived: true }).eq('id', editItemId); showToast(t('archived')); await loadItems(); closeModal('m-item'); renderInv(); }
 
     function openBarcodeScanner() { openModal('m-barcode'); startBarcodeScanner(); }
-    function startBarcodeScanner() { const videoElem = document.getElementById('bc-video'); const status = document.getElementById('bc-status'); status.textContent = t('startingCamera'); if (html5QrCode) { html5QrCode.stop().then(() => { html5QrCode = null; }).catch(()=>{}); } html5QrCode = new Html5Qrcode("bc-video"); videoElem.style.display = 'block'; html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 150 } }, (decodedText, decodedResult) => { stopBarcodeScanner(); lookupBarcode(decodedText); }, (errorMessage) => {}).then(() => { status.textContent = t('pointCamera'); }).catch(err => { status.textContent = t('startingCamera') + ' failed'; console.error(err); }); document.getElementById('barcode-title').textContent = t('scanBarcodeTitle'); document.getElementById('or-type').textContent = t('orTypeManually'); document.getElementById('bc-manual').placeholder = t('enterBarcode'); document.getElementById('btn-lookup').textContent = t('lookUp'); document.getElementById('btn-try-camera').textContent = t('tryCameraScan'); document.getElementById('btn-cancel-scan').textContent = t('cancelScanText'); }
-    function stopBarcodeScanner() { if (html5QrCode) { html5QrCode.stop().then(() => { html5QrCode = null; }).catch(()=>{}); } }
+    async function startBarcodeScanner() { 
+        const videoElem = document.getElementById('bc-video'); 
+        const status = document.getElementById('bc-status'); 
+        status.textContent = t('startingCamera'); 
+        
+        if (html5QrCode) { 
+            try {
+                await html5QrCode.stop();
+                html5QrCode.clear(); 
+            } catch(e) {
+                console.warn(e);
+            }
+            html5QrCode = null; 
+        } 
+        
+        html5QrCode = new Html5Qrcode("bc-video"); 
+        videoElem.style.display = 'block'; 
+        
+        try {
+            await html5QrCode.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: { width: 250, height: 150 } }, 
+                (decodedText, decodedResult) => { 
+                    stopBarcodeScanner(); 
+                    lookupBarcode(decodedText); 
+                }, 
+                (errorMessage) => {}
+            );
+            status.textContent = t('pointCamera'); 
+        } catch (err) {
+            status.textContent = t('startingCamera') + ' failed'; 
+            console.error(err); 
+        }
+
+        document.getElementById('barcode-title').textContent = t('scanBarcodeTitle'); 
+        document.getElementById('or-type').textContent = t('orTypeManually'); 
+        document.getElementById('bc-manual').placeholder = t('enterBarcode'); 
+        document.getElementById('btn-lookup').textContent = t('lookUp'); 
+        document.getElementById('btn-try-camera').textContent = t('tryCameraScan'); 
+        document.getElementById('btn-cancel-scan').textContent = t('cancelScanText'); 
+    }
+
+    function stopBarcodeScanner() { 
+        if (html5QrCode) { 
+            html5QrCode.stop().then(() => { 
+                html5QrCode.clear(); 
+                html5QrCode = null; 
+            }).catch(()=>{}); 
+        } 
+    }
     function closeBarcodeScanner() { stopBarcodeScanner(); closeModal('m-barcode'); }
   // Function to handle the scanned barcode
 // ========================================================
