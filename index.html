@@ -1574,9 +1574,30 @@ async function lookupBarcode(code) {
       }
     }
 
-    function displayResult(productName, barcode) {
-      const resContainer = document.getElementById('barcode-result');
-      const nameInput = document.getElementById('it-name');
+  function displayResult(productName, barcode) {
+      const itemModal = document.getElementById('m-item');
+      
+      // Check if the Add Ingredient window is hidden (meaning they used the shortcut button)
+      if (!itemModal.classList.contains('open')) {
+        // Open a fresh Add Ingredient window and auto-fill the scanned name!
+        openAddItem({ name: productName });
+      } else {
+        // They scanned from inside the Add Ingredient window. Just update the text box.
+        const resContainer = document.getElementById('barcode-result');
+        const nameInput = document.getElementById('it-name');
+        
+        if (resContainer) {
+          resContainer.innerHTML = `<strong>Product Found:</strong> ${productName} <br><small>Barcode: ${barcode}</small>`;
+          resContainer.style.display = 'block';
+        }
+        if (nameInput) {
+          nameInput.value = productName;
+        }
+      }
+      
+      // Automatically close the camera window so the user can hit "Save to Fridge"
+      closeBarcodeScanner();
+    }
       
       if (resContainer) {
         resContainer.innerHTML = `<strong>Product Found:</strong> ${productName} <br><small>Barcode: ${barcode}</small>`;
