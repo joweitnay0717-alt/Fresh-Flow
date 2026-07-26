@@ -1587,10 +1587,13 @@ async function lookupBarcode(code) {
       }
       
       // THE FIX: Automatically close the camera window so the user can hit "Save to Fridge"!
+      // THE FIX: Automatically close the camera window so the user can hit "Save to Fridge"!
       closeBarcodeScanner();
     }
+
+    function renderCuisineFilter() {
         const cuisines = ['All', ...new Set(RECIPES.map(r => r.cuisine))];
-        document.getElementById('cuisine-filter').innerHTML = cuisines.map(c => 
+        document.getElementById('cuisine-filter').innerHTML = cuisines.map(c =>
             `<div class="chip ${recipeCuisineFilter===c?'on':''}" onclick="recipeCuisineFilter='${c}';renderCuisineFilter();renderRecipes()">${c==='All'?t('all'):t(c)}</div>`
         ).join('');
     }
