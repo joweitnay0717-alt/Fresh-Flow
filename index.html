@@ -1511,8 +1511,10 @@ function doGoogleSignIn() {
     // ========================================================
     // 2. FIXED BARCODE LOOKUP SYSTEM (Replaces old functions)
     // ========================================================
-    async function lookupBarcode(code) {
+async function lookupBarcode(code) {
       try {
+        const status = document.getElementById('bc-status');
+        if (status) status.textContent = 'Looking up barcode...';
         console.log(`Scanning barcode: ${code}...`);
 
         // 1. Check global Open Food Facts API
@@ -1525,7 +1527,7 @@ function doGoogleSignIn() {
           return;
         }
 
-        // 2. Check local database table (FIXED: Uses SB instead of _supabase)
+        // 2. Check local database table
         console.log("Not found globally. Checking local Supabase database...");
         const { data: localData, error: fetchError } = await SB
           .from('malaysian_products')
@@ -1534,7 +1536,7 @@ function doGoogleSignIn() {
           .single();
 
         if (localData && localData.product_name) {
-          displayResult(`${localData.product_name} (Local Data)`, code);
+          displayResult(localData.product_name, code);
           return; 
         }
 
@@ -1542,7 +1544,8 @@ function doGoogleSignIn() {
         promptUserToAddNewProduct(code);
 
       } catch (error) {
-        alert(`The real error is: ${error.message}`);
+        alert(`Network error or API timeout: ${error.message}`);
+        startBarcodeScanner(); // Restart the scanner so it doesn't get stuck
       }
     }
 
@@ -1550,7 +1553,6 @@ function doGoogleSignIn() {
       const newProductName = prompt(`Barcode ${code} not found!\n\nPlease enter the name of this local product to save it for everyone:`);
 
       if (newProductName && newProductName.trim() !== "") {
-        // FIXED: Uses SB instead of _supabase
         const { error: insertError } = await SB
           .from('malaysian_products')
           .insert([
@@ -1560,15 +1562,18 @@ function doGoogleSignIn() {
         if (insertError) {
           console.error("Failed to save to Supabase:", insertError);
           alert(`Oops! Failed to save. Error: ${insertError.message}`);
+          startBarcodeScanner(); // Restart on fail
         } else {
-          alert(`Awesome! "${newProductName.trim()}" has been added to our local database.`);
-          displayResult(`${newProductName.trim()} (New Local)`, code);
+          // Success! Pass the name to the form
+          displayResult(newProductName.trim(), code);
           loadCustomDatabaseSuggestions(); // Refresh list immediately
         }
+      } else {
+        // User cancelled the prompt. Restart the camera automatically to scan another product!
+        startBarcodeScanner();
       }
     }
 
-    // FIXED: Maps your text directly to the input box ("it-name") and barcode block
     function displayResult(productName, barcode) {
       const resContainer = document.getElementById('barcode-result');
       const nameInput = document.getElementById('it-name');
@@ -1580,9 +1585,10 @@ function doGoogleSignIn() {
       if (nameInput) {
         nameInput.value = productName;
       }
+      
+      // THE FIX: Automatically close the camera window so the user can hit "Save to Fridge"!
+      closeBarcodeScanner();
     }
-
-    function renderCuisineFilter() {
         const cuisines = ['All', ...new Set(RECIPES.map(r => r.cuisine))];
         document.getElementById('cuisine-filter').innerHTML = cuisines.map(c => 
             `<div class="chip ${recipeCuisineFilter===c?'on':''}" onclick="recipeCuisineFilter='${c}';renderCuisineFilter();renderRecipes()">${c==='All'?t('all'):t(c)}</div>`
