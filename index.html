@@ -1,23 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Fresh Flow</title>
-  
-  <!-- Paste your favicon link right here -->
-<link rel="icon" type="image/png" href="favicon.png?v=2">
-<link rel="manifest" href="manifest.json?v=2">
-
-</head>
-<body>
-  <!-- The rest of your website is down here -->
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
     <meta name="theme-color" content="#389C9A">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="FreshFlow">
     <title>FreshFlow</title>
+    <link rel="icon" type="image/png" href="favicon.png?v=2">
     <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkZyZXNoRmxvdyIsCiAgInNob3J0X25hbWUiOiAiRnJlc2hGbG93IiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNGRkZGRkYiLAogICJ0aGVtZV9jb2xvciI6ICIjMzg5QzlBIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sLCUzQ3N2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJyUzRSUzQ3RleHQgeT0nLjllbScgZm9udC1zaXplPSc5MCclMjAn8J+ihic8L3RleHQlM0UlM0Mvc3ZnJTNFIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0KfQ==">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2006,7 +1996,37 @@ async function lookupBarcode(code) {
         alertBanner.style.display = 'none';
       }
     } // <--- THIS IS THE BRACKET THAT WAS MISSING!
+// ========================================================
+    // PWA INSTALL PROMPT ENGINE (DOWNLOAD WINDOW)
+    // ========================================================
+    let deferredPrompt = null;
 
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome from showing its default prompt immediately
+        e.preventDefault();
+        // Save the event to trigger it later
+        deferredPrompt = e;
+
+        // Show the install pop-up 2 seconds after the app loads
+        setTimeout(() => {
+            if (deferredPrompt) {
+                showDialog(
+                    "Install FreshFlow", 
+                    "Add FreshFlow to your home screen for quick access and offline use!", 
+                    "Install", 
+                    () => {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then((choiceResult) => {
+                            if (choiceResult.outcome === 'accepted') {
+                                showToast("FreshFlow installed successfully!");
+                            }
+                            deferredPrompt = null;
+                        });
+                    }
+                );
+            }
+        }, 2000);
+    });
     </script>
 </body>
 </html>
