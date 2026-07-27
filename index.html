@@ -1998,39 +1998,6 @@ async function lookupBarcode(code) {
         alertBanner.style.display = 'none';
       }
     } // <--- THIS IS THE BRACKET THAT WAS MISSING!
-// ========================================================
-    // PWA INSTALL PROMPT ENGINE (DOWNLOAD WINDOW)
-    // ========================================================
-    let deferredPrompt = null;
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent Chrome from showing its default prompt immediately
-        e.preventDefault();
-        // Save the event to trigger it later
-        deferredPrompt = e;
-
-        // Show the install pop-up 2 seconds after the app loads
-        setTimeout(() => {
-            if (deferredPrompt) {
-                showDialog(
-                    "Install FreshFlow", 
-                    "Add FreshFlow to your home screen for quick access and offline use!", 
-                    "Install", 
-                    () => {
-                        deferredPrompt.prompt();
-                        deferredPrompt.userChoice.then((choiceResult) => {
-                            if (choiceResult.outcome === 'accepted') {
-                                showToast("FreshFlow installed successfully!");
-                            }
-                            deferredPrompt = null;
-                        });
-                    }
-                );
-            }
-        }, 2000);
-    });
-    </script>
-</body>
-</html>
+</script>
 </body>
 </html>
